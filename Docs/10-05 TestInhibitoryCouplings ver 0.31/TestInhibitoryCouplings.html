@@ -1,0 +1,291 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Script for testing the model with inhibitory couplings</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-10-05"><meta name="DC.source" content="TestInhibitoryCouplings.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Script for testing the model with inhibitory couplings</h1><!--introduction--><p>Oct. 5, 2019, ver 0.31. Added new rule</p><p><b>Option D:</b></p><p><img src="TestInhibitoryCouplings_eq10824915976476361875.png" alt="$$v_{j}^{in}(t) = d \sum_{k=1}^{M} y_k(t)(y_k(t) - y_j(t)) $$" style="width:206px;height:44px;"></p><p><img src="TestInhibitoryCouplings_eq14845064944915847878.png" alt="$$y_{j}^{in}(t) = H(v_{j}^{in}(t) - \theta_{in})$$" style="width:148px;height:19px;"></p><p><img src="TestInhibitoryCouplings_eq04327300293431915209.png" alt="$$v_{j}(t) = w_{j}(t)s(t) - 1 * y_{j}^{in}(t)$$" style="width:178px;height:19px;"></p><p><img src="TestInhibitoryCouplings_eq13025154138826045344.png" alt="$$y_j(t+1) = H\left[v_j(t) - \theta \right]$$" style="width:151px;height:16px;"></p><p>The results are very good. The rSelective ratio does not decrease significatively while rLost does.</p><p><b>rng(2)</b> The number of lost stimuli reduces from 143 (d = 0) to 9 (d = 150).</p><p>Oct. 3, 2019, ver. 0.3. Added new rule</p><p><b>Option C:</b></p><p><img src="TestInhibitoryCouplings_eq02921833812976518333.png" alt="$$\dot{w}_j = \alpha y_j\left(\left[\beta^2 - d\sum_{k\ne j} y_k\right]s - v_jw_j\right)$$" style="width:238px;height:54px;"></p><p><img src="TestInhibitoryCouplings_eq01201607465739621406.png" alt="$$y_j = H(v_j - \theta)$$" style="width:94px;height:16px;"></p><p>The rults are ok.</p><p><b>rng(2)</b> The number of lost stimuli reduces from 143 (d = 0) to 60 (d = 4).</p><p>Oct. 2, 2019. ver. 0.21. Correction of small mistakes in the final figure. Speed up Option B</p><p>Sept. 30, 2019. ver. 0.2. Implemented the following updating rules:</p><p><b>Option B:</b></p><p><img src="TestInhibitoryCouplings_eq10966813202743490536.png" alt="$$y_j(t+1) = H\left[v_j(t) - \theta - d \sum_{k=1}^{M} y_k(t)(y_k(t) -&#xA;y_j(t)) \right]$$" style="width:329px;height:45px;"></p><p>The rults are even less satisfactory than with Option A The reduction is even smaller.</p><p><b>rng(2)</b> The number of lost stimuli reduces from 143 (d = 0) to 122 (d = 1).</p><p>Sept. 27, 2019. ver. 0.1. Implemented the following updating rule:</p><p><b>Option A:</b></p><p><img src="TestInhibitoryCouplings_eq02331756490835651974.png" alt="$$y_j(t+1) = H\left[v_j(t) - \theta - d \sum_{j\ne k} y_k(t) \right]$$" style="width:242px;height:54px;"></p><p>The results are not satisfactory. The number of neurons learning first stimuli reduces. However, the reduction is quite modest.</p><p><b>rng(2)</b> The number of lost stimuli reduces from 143 (d = 0) to 117 (d = 1).</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Set the problem parameters</a></li><li><a href="#2">Do simulations with Option A</a></li><li><a href="#3">Do simulations with Option B</a></li><li><a href="#4">Do simulations with Option C</a></li><li><a href="#5">Do simulations with Option D</a></li></ul></div><h2 id="1">Set the problem parameters</h2><pre class="codeinput">clear
+path(path,<span class="string">'MatFunc'</span>)
+rng(2) <span class="comment">% for reproducibility of the results</span>
+
+psl = 0.95;       <span class="comment">% selective probability</span>
+n = 30;           <span class="comment">% neuron dimension</span>
+M = 300;          <span class="comment">% number of neurons</span>
+L = 200;          <span class="comment">% number of stimuli</span>
+Th = sqrt(3)*0.5; <span class="comment">% threshold</span>
+alpha = 20;
+Tmax = 400;       <span class="comment">% max integration time</span>
+
+f = @(x) mod(round(x),L)+1;   <span class="comment">% function defining the stimulus sequence</span>
+
+delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
+b2 = (Th/delta)^2;  <span class="comment">% beta^2</span>
+
+W0 = 2*rand(n,M) - 1;  <span class="comment">% random neurons</span>
+s = sqrt(3/n)*(2*rand(n,L) - 1); <span class="comment">% random stimuli</span>
+[~,id] = sort(sum(s'*W0 &gt; Th)); <span class="comment">% sort neurons for convenience</span>
+W0 = W0(:,id);
+</pre><h2 id="2">Do simulations with Option A</h2><pre class="codeinput">h = 0.01;         <span class="comment">% time step</span>
+d = 1;            <span class="comment">% inhibitory coupling</span>
+inh = @(y) d*(sum(y) - y); <span class="comment">% Option A</span>
+
+W = SimulateNeurons2(Tmax, h, W0, s, f, alpha, b2, Th, inh);
+
+clf
+PlotNetworkSelectivity(W0, W, s, Th, d)
+</pre><pre class="codeoutput">*************
+rSelective = 100%; rLost = 58.5%
+</pre><img vspace="5" hspace="5" src="TestInhibitoryCouplings_01.png" alt=""> <h2 id="3">Do simulations with Option B</h2><pre class="codeinput">h = 0.01;         <span class="comment">% time step</span>
+d = 1;            <span class="comment">% inhibitory coupling</span>
+inh = @(y) d*(sum(y.^2) - sum(y)*y); <span class="comment">% Option B</span>
+
+W = SimulateNeurons2(Tmax, h, W0, s, f, alpha, b2, Th, inh);
+
+clf
+PlotNetworkSelectivity(W0, W, s, Th, d)
+</pre><pre class="codeoutput">*************
+rSelective = 100%; rLost = 61%
+</pre><img vspace="5" hspace="5" src="TestInhibitoryCouplings_02.png" alt=""> <h2 id="4">Do simulations with Option C</h2><pre class="codeinput">h = 0.005;        <span class="comment">% time step (better to decrease)</span>
+d = 4;            <span class="comment">% inhibitory coupling</span>
+
+W = SimulateNeurons3(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+clf
+PlotNetworkSelectivity(W0, W, s, Th, d)
+</pre><pre class="codeoutput">*************
+rSelective = 76.7%; rLost = 30%
+</pre><img vspace="5" hspace="5" src="TestInhibitoryCouplings_03.png" alt=""> <h2 id="5">Do simulations with Option D</h2><pre class="codeinput">h = 0.005;
+d = 150;
+
+<span class="comment">% Option D</span>
+
+W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+clf
+PlotNetworkSelectivity(W0, W, s, Th, d)
+
+figure
+V = W'*s;
+F = V &gt; Th;
+R = orderRasterPlot(F');
+spy(R);
+title(<span class="string">"Rasterplot neurons and stimuli they respond to"</span>);
+xlabel(<span class="string">"Neurons"</span>);
+ylabel(<span class="string">"Stimuli"</span>);
+</pre><pre class="codeoutput">*************
+rSelective = 97.3%; rLost = 4.5%
+</pre><img vspace="5" hspace="5" src="TestInhibitoryCouplings_04.png" alt=""> <img vspace="5" hspace="5" src="TestInhibitoryCouplings_05.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Script for testing the model with inhibitory couplings
+%
+% Oct. 5, 2019, ver 0.31.
+% Added new rule 
+%
+% *Option D:*
+%
+% $$v_{j}^{in}(t) = d \sum_{k=1}^{M} y_k(t)(y_k(t) - y_j(t)) $$ 
+%
+% $$y_{j}^{in}(t) = H(v_{j}^{in}(t) - \theta_{in})$$
+%
+% $$v_{j}(t) = w_{j}(t)s(t) - 1 * y_{j}^{in}(t)$$
+%
+% $$y_j(t+1) = H\left[v_j(t) - \theta \right]$$
+% 
+% The results are very good. The rSelective ratio does not decrease
+% significatively while rLost does.
+% 
+% *rng(2)*
+% The number of lost stimuli reduces from 143 (d = 0) to 9 (d = 150).
+% 
+%
+% Oct. 3, 2019, ver. 0.3.
+% Added new rule
+%
+% *Option C:*
+% 
+% $$\dot{w}_j = \alpha y_j\left(\left[\beta^2 - d\sum_{k\ne j} y_k\right]s - v_jw_j\right)$$
+%
+% $$y_j = H(v_j - \theta)$$
+% 
+% The rults are ok.
+%
+% *rng(2)*
+% The number of lost stimuli reduces from 143 (d = 0) to 60 (d = 4).
+%
+% Oct. 2, 2019. ver. 0.21.
+% Correction of small mistakes in the final figure.
+% Speed up Option B
+%
+%
+% Sept. 30, 2019. ver. 0.2.
+% Implemented the following updating rules:
+%
+% *Option B:*
+%
+% $$y_j(t+1) = H\left[v_j(t) - \theta - d \sum_{k=1}^{M} y_k(t)(y_k(t) -
+% y_j(t)) \right]$$
+%
+% The rults are even less satisfactory than with Option A
+% The reduction is even smaller.
+%
+% *rng(2)*
+% The number of lost stimuli reduces from 143 (d = 0) to 122 (d = 1).
+%
+%
+% Sept. 27, 2019. ver. 0.1.
+% Implemented the following updating rule:
+% 
+% *Option A:*
+%
+% $$y_j(t+1) = H\left[v_j(t) - \theta - d \sum_{j\ne k} y_k(t) \right]$$
+% 
+% The results are not satisfactory.
+% The number of neurons learning first stimuli reduces. However, 
+% the reduction is quite modest. 
+%
+% *rng(2)*
+% The number of lost stimuli 
+% reduces from 143 (d = 0) to 117 (d = 1). 
+%
+
+%% Set the problem parameters
+%
+clear
+path(path,'MatFunc')
+rng(2) % for reproducibility of the results
+
+psl = 0.95;       % selective probability
+n = 30;           % neuron dimension
+M = 300;          % number of neurons
+L = 200;          % number of stimuli
+Th = sqrt(3)*0.5; % threshold
+alpha = 20;  
+Tmax = 400;       % max integration time
+
+f = @(x) mod(round(x),L)+1;   % function defining the stimulus sequence
+
+delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
+b2 = (Th/delta)^2;  % beta^2
+
+W0 = 2*rand(n,M) - 1;  % random neurons
+s = sqrt(3/n)*(2*rand(n,L) - 1); % random stimuli
+[~,id] = sort(sum(s'*W0 > Th)); % sort neurons for convenience
+W0 = W0(:,id);
+
+%% Do simulations with Option A
+%
+h = 0.01;         % time step
+d = 1;            % inhibitory coupling
+inh = @(y) d*(sum(y) - y); % Option A
+
+W = SimulateNeurons2(Tmax, h, W0, s, f, alpha, b2, Th, inh);
+
+clf
+PlotNetworkSelectivity(W0, W, s, Th, d)
+
+%% Do simulations with Option B
+%
+h = 0.01;         % time step
+d = 1;            % inhibitory coupling
+inh = @(y) d*(sum(y.^2) - sum(y)*y); % Option B
+
+W = SimulateNeurons2(Tmax, h, W0, s, f, alpha, b2, Th, inh);
+
+clf
+PlotNetworkSelectivity(W0, W, s, Th, d)
+
+%% Do simulations with Option C
+%
+h = 0.005;        % time step (better to decrease)
+d = 4;            % inhibitory coupling
+
+W = SimulateNeurons3(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+clf
+PlotNetworkSelectivity(W0, W, s, Th, d)
+
+%% Do simulations with Option D
+%
+h = 0.005;
+d = 150;
+
+% Option D
+
+W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+clf
+PlotNetworkSelectivity(W0, W, s, Th, d)
+
+figure
+V = W'*s;
+F = V > Th;
+R = orderRasterPlot(F');
+spy(R);
+title("Rasterplot neurons and stimuli they respond to");
+xlabel("Neurons");
+ylabel("Stimuli");
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,497 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Script for testing simple pattern recognition</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-10-23"><meta name="DC.source" content="TestPatterns.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Script for testing simple pattern recognition</h1><!--introduction--><p>Given <img src="TestPatterns_eq15636846968047188835.png" alt="$k$" style="width:7px;height:11px;">, we generate a set <img src="TestPatterns_eq13550288387652718254.png" alt="$(6k-2)$" style="width:50px;height:15px;"> of binary patterns on a grid of <img src="TestPatterns_eq17017788883685003547.png" alt="$k \times k$" style="width:33px;height:11px;"> composed of vertical, horizontal and diagonal lines. We then make the model learn (option C and option D) with this stimuli and test its capacity of prediction. We then repeat the experiment adding two more complex patterns (crosses)</p><p><b>Option D:</b></p><p><img src="TestPatterns_eq10824915976476361875.png" alt="$$v_{j}^{in}(t) = d \sum_{k=1}^{M} y_k(t)(y_k(t) - y_j(t)) $$" style="width:206px;height:44px;"></p><p><img src="TestPatterns_eq14845064944915847878.png" alt="$$y_{j}^{in}(t) = H(v_{j}^{in}(t) - \theta_{in})$$" style="width:148px;height:19px;"></p><p><img src="TestPatterns_eq04327300293431915209.png" alt="$$v_{j}(t) = w_{j}(t)s(t) - 1 * y_{j}^{in}(t)$$" style="width:178px;height:19px;"></p><p><img src="TestPatterns_eq13025154138826045344.png" alt="$$y_j(t+1) = H\left[v_j(t) - \theta \right]$$" style="width:151px;height:16px;"></p><p><b>Option C:</b></p><p><img src="TestPatterns_eq02921833812976518333.png" alt="$$\dot{w}_j = \alpha y_j\left(\left[\beta^2 - d\sum_{k\ne j} y_k\right]s - v_jw_j\right)$$" style="width:238px;height:54px;"></p><p><img src="TestPatterns_eq01201607465739621406.png" alt="$$y_j = H(v_j - \theta)$$" style="width:94px;height:16px;"></p><p>Oct. 23, 2019, ver 0.2.</p><p><b>rng(2)</b> <b>k = 7</b></p><p>By increasing the value of <img src="TestPatterns_eq15636846968047188835.png" alt="$k$" style="width:7px;height:11px;"> and, therefore, the dimensions of the stimuli and by normalizing the patterns we get that the results do not worsen that much between without complex patterns (C:0.4750, D:0.975 vs C:0.4286, D: 0.9048)</p><p>Oct. 13, 2019, ver 0.1.</p><p><b>rng(2)</b> <b>k = 5</b></p><p><b>Simple patterns</b></p><p>The results are very good with better accuracy for option D (0.9643) than option C (0.6789)</p><p><b>Complex patterns</b></p><p>Just by adding the two crosses the learning worsens significatively and the accuracy of both methods decrases (C: 0.2667 - D: 0.3667)</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Set the problem parameters</a></li><li><a href="#2">Do simulations with Option C. Simple patterns</a></li><li><a href="#3">Do simulations with Option D. Simple patterns</a></li><li><a href="#4">Add complex patterns</a></li><li><a href="#5">Do simulations with Option C. Complex patterns</a></li><li><a href="#6">Do simulations with Option D. Complex patterns</a></li></ul></div><h2 id="1">Set the problem parameters</h2><pre class="codeinput">clear
+close <span class="string">all</span>
+path(path,<span class="string">'MatFunc'</span>)
+rng(2) <span class="comment">% for reproducibility of the results</span>
+
+k = 7;
+psl = 0.95;       <span class="comment">% selective probability</span>
+n = k*k;           <span class="comment">% neuron dimension</span>
+M = 100;          <span class="comment">% number of neurons</span>
+L = 6*k-2;          <span class="comment">% number of stimuli</span>
+Th = sqrt(3)*0.5; <span class="comment">% threshold</span>
+alpha = 20;
+Tmax = 400;       <span class="comment">% max integration time</span>
+
+f = @(x) mod(round(x),L)+1;   <span class="comment">% function defining the stimulus sequence</span>
+
+delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
+b2 = (Th/delta)^2;  <span class="comment">% beta^2</span>
+
+[p,s] = generatePatterns(k); <span class="comment">% generate patterns</span>
+
+W0 = 2*rand(n,M) - 1;  <span class="comment">% random neurons</span>
+[~,id] = sort(sum(s'*W0 &gt; Th)); <span class="comment">% sort neurons for convenience</span>
+W0 = W0(:,id);
+
+<span class="comment">% Plot some patterns</span>
+clf
+<span class="keyword">for</span> i=1:8
+   subplot(4,2,i)
+   showPattern(p(:,:,i*floor(L/8)));
+<span class="keyword">end</span>
+sgtitle(<span class="string">"Some of the patterns used"</span>);
+</pre><img vspace="5" hspace="5" src="TestPatterns_01.png" alt=""> <h2 id="2">Do simulations with Option C. Simple patterns</h2><pre class="codeinput">h = 0.005;        <span class="comment">% time step (better to decrease)</span>
+d = 4;            <span class="comment">% inhibitory coupling</span>
+
+W = SimulateNeurons3(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+ac = accuracy(W,s,Th)
+
+
+<span class="comment">% Plot raster</span>
+figure;
+V = W'*s;
+F = V &gt; Th;
+R = orderRasterPlot(F');
+spy(R);
+title(<span class="string">"Rasterplot neurons and stimuli they respond to"</span>);
+xlabel(<span class="string">"Neurons"</span>);
+ylabel(<span class="string">"Stimuli"</span>);
+
+<span class="comment">% Plot patterns</span>
+figure
+j = 1;
+<span class="keyword">for</span> i=1:5
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,i*floor(L/5)));
+    pred = predict(V,W,s(:,i*floor(L/5)),Th);
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,pred));
+<span class="keyword">end</span>
+sgtitle(<span class="string">"Shown stimulus vs predicted stimulus"</span>);
+</pre><pre class="codeoutput">
+ac =
+
+    0.4750
+
+</pre><img vspace="5" hspace="5" src="TestPatterns_02.png" alt=""> <img vspace="5" hspace="5" src="TestPatterns_03.png" alt=""> <h2 id="3">Do simulations with Option D. Simple patterns</h2><pre class="codeinput">h = 0.005;
+d = 150;
+
+<span class="comment">% Option D</span>
+
+W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+ac = accuracy(W,s,Th)
+
+<span class="comment">% Plot raster</span>
+figure;
+V = W'*s;
+F = V &gt; Th;
+R = orderRasterPlot(F');
+spy(R);
+title(<span class="string">"Rasterplot neurons and stimuli they respond to"</span>);
+xlabel(<span class="string">"Neurons"</span>);
+ylabel(<span class="string">"Stimuli"</span>);
+
+<span class="comment">% Plot patterns</span>
+figure
+j = 1;
+<span class="keyword">for</span> i=1:5
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,i*floor(L/5)));
+    pred = predict(V,W,s(:,i*floor(L/5)),Th);
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,pred));
+<span class="keyword">end</span>
+sgtitle(<span class="string">"Shown stimulus vs predicted stimulus"</span>);
+</pre><pre class="codeoutput">
+ac =
+
+    0.9750
+
+</pre><img vspace="5" hspace="5" src="TestPatterns_04.png" alt=""> <img vspace="5" hspace="5" src="TestPatterns_05.png" alt=""> <h2 id="4">Add complex patterns</h2><pre class="codeinput">hk = ceil(k/2);
+cross1 = p(:,:,hk) + p(:,:,hk+k);
+cross1(hk,hk) = 1;
+cross1 = cross1/norm(cross1);
+cross2 = p(:,:,2*k+1) + p(:,:,2*k+2);
+cross2(hk,hk) = 1;
+cross2 = cross2/norm(cross2);
+
+<span class="comment">% Plot crosses</span>
+subplot(1,2,1); showPattern(cross1);
+subplot(1,2,2); showPattern(cross2);
+sgtitle(<span class="string">"Crosses added"</span>);
+
+
+p(:,:,6*k-1) = cross1;
+p(:,:,6*k) = cross2;
+s = [s cross1(:) cross2(:)];
+</pre><img vspace="5" hspace="5" src="TestPatterns_06.png" alt=""> <h2 id="5">Do simulations with Option C. Complex patterns</h2><pre class="codeinput">h = 0.005;        <span class="comment">% time step (better to decrease)</span>
+d = 4;            <span class="comment">% inhibitory coupling</span>
+
+W = SimulateNeurons3(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+ac = accuracy(W,s,Th)
+
+<span class="comment">% Plot raster</span>
+figure;
+V = W'*s;
+F = V &gt; Th;
+R = orderRasterPlot(F');
+spy(R);
+title(<span class="string">"Rasterplot neurons and stimuli they respond to"</span>);
+xlabel(<span class="string">"Neurons"</span>);
+ylabel(<span class="string">"Stimuli"</span>);
+
+<span class="comment">% Plot patterns</span>
+figure
+j = 1;
+<span class="keyword">for</span> i=1:5
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,i*floor(L/5)));
+    pred = predict(V,W,s(:,i*floor(L/5)),Th);
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,pred));
+<span class="keyword">end</span>
+sgtitle(<span class="string">"Shown stimulus vs predicted stimulus"</span>);
+</pre><pre class="codeoutput">
+ac =
+
+    0.4286
+
+</pre><img vspace="5" hspace="5" src="TestPatterns_07.png" alt=""> <img vspace="5" hspace="5" src="TestPatterns_08.png" alt=""> <h2 id="6">Do simulations with Option D. Complex patterns</h2><pre class="codeinput">h = 0.005;
+d = 150;
+
+<span class="comment">% Option D</span>
+
+W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+ac = accuracy(W,s,Th)
+
+<span class="comment">% Plot raster</span>
+figure;
+V = W'*s;
+F = V &gt; Th;
+R = orderRasterPlot(F');
+spy(R);
+title(<span class="string">"Rasterplot neurons and stimuli they respond to"</span>);
+xlabel(<span class="string">"Neurons"</span>);
+ylabel(<span class="string">"Stimuli"</span>);
+
+<span class="comment">% Plot patterns</span>
+figure
+j = 1;
+<span class="keyword">for</span> i=1:5
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,i*floor(L/5)));
+    pred = predict(V,W,s(:,i*floor(L/5)),Th);
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,pred));
+<span class="keyword">end</span>
+sgtitle(<span class="string">"Shown stimulus vs predicted stimulus"</span>);
+</pre><pre class="codeoutput">
+ac =
+
+    0.9048
+
+</pre><img vspace="5" hspace="5" src="TestPatterns_09.png" alt=""> <img vspace="5" hspace="5" src="TestPatterns_10.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Script for testing simple pattern recognition
+%
+% Given $k$, we generate a set $(6k-2)$ of binary patterns on a grid of $k
+% \times k$ composed of vertical, horizontal and diagonal lines. We then
+% make the model learn (option C and option D) with this stimuli and test 
+% its capacity of prediction. We then repeat the experiment adding two more complex
+% patterns (crosses)
+% 
+% *Option D:*
+%
+% $$v_{j}^{in}(t) = d \sum_{k=1}^{M} y_k(t)(y_k(t) - y_j(t)) $$ 
+%
+% $$y_{j}^{in}(t) = H(v_{j}^{in}(t) - \theta_{in})$$
+%
+% $$v_{j}(t) = w_{j}(t)s(t) - 1 * y_{j}^{in}(t)$$
+%
+% $$y_j(t+1) = H\left[v_j(t) - \theta \right]$$
+% 
+% *Option C:*
+% 
+% $$\dot{w}_j = \alpha y_j\left(\left[\beta^2 - d\sum_{k\ne j} y_k\right]s - v_jw_j\right)$$
+%
+% $$y_j = H(v_j - \theta)$$
+%
+% Oct. 23, 2019, ver 0.2.
+%
+% *rng(2)*
+% *k = 7*
+%
+% By increasing the value of $k$ and, therefore, the dimensions of the
+% stimuli and by normalizing the patterns we get that the results do not
+% worsen that much between without complex patterns (C:0.4750, D:0.975 vs
+% C:0.4286, D: 0.9048)
+%
+%
+% Oct. 13, 2019, ver 0.1.
+% 
+% *rng(2)*
+% *k = 5*
+% 
+% *Simple patterns*
+%
+% The results are very good with better accuracy for option D (0.9643) than
+% option C (0.6789)
+%
+% *Complex patterns*
+% 
+% Just by adding the two crosses the learning worsens significatively and
+% the accuracy of both methods decrases (C: 0.2667 - D: 0.3667)
+%
+
+
+%% Set the problem parameters
+%
+clear
+close all
+path(path,'MatFunc')
+rng(2) % for reproducibility of the results
+
+k = 7;
+psl = 0.95;       % selective probability
+n = k*k;           % neuron dimension
+M = 100;          % number of neurons
+L = 6*k-2;          % number of stimuli
+Th = sqrt(3)*0.5; % threshold
+alpha = 20;  
+Tmax = 400;       % max integration time
+
+f = @(x) mod(round(x),L)+1;   % function defining the stimulus sequence
+
+delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
+b2 = (Th/delta)^2;  % beta^2
+
+[p,s] = generatePatterns(k); % generate patterns
+
+W0 = 2*rand(n,M) - 1;  % random neurons
+[~,id] = sort(sum(s'*W0 > Th)); % sort neurons for convenience
+W0 = W0(:,id);
+
+% Plot some patterns
+clf
+for i=1:8
+   subplot(4,2,i)
+   showPattern(p(:,:,i*floor(L/8)));
+end
+sgtitle("Some of the patterns used");
+
+
+%% Do simulations with Option C. Simple patterns
+%
+h = 0.005;        % time step (better to decrease)
+d = 4;            % inhibitory coupling
+
+W = SimulateNeurons3(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+ac = accuracy(W,s,Th)
+
+
+% Plot raster
+figure;
+V = W'*s;
+F = V > Th;
+R = orderRasterPlot(F');
+spy(R);
+title("Rasterplot neurons and stimuli they respond to");
+xlabel("Neurons");
+ylabel("Stimuli");
+
+% Plot patterns
+figure
+j = 1;
+for i=1:5
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,i*floor(L/5)));
+    pred = predict(V,W,s(:,i*floor(L/5)),Th);
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,pred));
+end 
+sgtitle("Shown stimulus vs predicted stimulus");
+
+
+%% Do simulations with Option D. Simple patterns
+%
+h = 0.005;
+d = 150;
+
+% Option D
+
+W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+ac = accuracy(W,s,Th)
+
+% Plot raster
+figure;
+V = W'*s;
+F = V > Th;
+R = orderRasterPlot(F');
+spy(R);
+title("Rasterplot neurons and stimuli they respond to");
+xlabel("Neurons");
+ylabel("Stimuli");
+
+% Plot patterns
+figure
+j = 1;
+for i=1:5
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,i*floor(L/5)));
+    pred = predict(V,W,s(:,i*floor(L/5)),Th);
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,pred));
+end 
+sgtitle("Shown stimulus vs predicted stimulus");
+
+%% Add complex patterns
+
+hk = ceil(k/2);
+cross1 = p(:,:,hk) + p(:,:,hk+k);
+cross1(hk,hk) = 1;
+cross1 = cross1/norm(cross1);
+cross2 = p(:,:,2*k+1) + p(:,:,2*k+2);
+cross2(hk,hk) = 1;
+cross2 = cross2/norm(cross2);
+
+% Plot crosses
+subplot(1,2,1); showPattern(cross1);
+subplot(1,2,2); showPattern(cross2);
+sgtitle("Crosses added");
+
+
+p(:,:,6*k-1) = cross1;
+p(:,:,6*k) = cross2;
+s = [s cross1(:) cross2(:)];
+
+%% Do simulations with Option C. Complex patterns
+%
+h = 0.005;        % time step (better to decrease)
+d = 4;            % inhibitory coupling
+
+W = SimulateNeurons3(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+ac = accuracy(W,s,Th)
+
+% Plot raster
+figure;
+V = W'*s;
+F = V > Th;
+R = orderRasterPlot(F');
+spy(R);
+title("Rasterplot neurons and stimuli they respond to");
+xlabel("Neurons");
+ylabel("Stimuli");
+
+% Plot patterns
+figure
+j = 1;
+for i=1:5
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,i*floor(L/5)));
+    pred = predict(V,W,s(:,i*floor(L/5)),Th);
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,pred));
+end 
+sgtitle("Shown stimulus vs predicted stimulus");
+
+%% Do simulations with Option D. Complex patterns
+%
+h = 0.005;
+d = 150;
+
+% Option D
+
+W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+ac = accuracy(W,s,Th)
+
+% Plot raster
+figure;
+V = W'*s;
+F = V > Th;
+R = orderRasterPlot(F');
+spy(R);
+title("Rasterplot neurons and stimuli they respond to");
+xlabel("Neurons");
+ylabel("Stimuli");
+
+% Plot patterns
+figure
+j = 1;
+for i=1:5
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,i*floor(L/5)));
+    pred = predict(V,W,s(:,i*floor(L/5)),Th);
+    subplot(5,2,j); j = j + 1;
+    showPattern(p(:,:,pred));
+end 
+sgtitle("Shown stimulus vs predicted stimulus");
+
+
+##### SOURCE END #####
+--></body></html>
