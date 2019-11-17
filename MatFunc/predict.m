@@ -12,8 +12,9 @@ function pred = predict(V,W,s,Th);
     %   pred = guess of the position s occupies 
     %   in the L columns of V
     
-   
+    epsilon = 2e-10;
     y = max(0,s'*W - Th); % compute reaction to s
+    y = y.*(y > epsilon);
     idx = find(y > 0); % find which neurons respond at all
     F = (V > Th)';
     numstim = sum(F,1);
