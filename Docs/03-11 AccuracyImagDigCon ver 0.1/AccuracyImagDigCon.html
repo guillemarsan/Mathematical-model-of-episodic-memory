@@ -1,0 +1,345 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Script for testing association: raw images</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-03-29"><meta name="DC.source" content="AccuracyImagDigCon.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Script for testing association: raw images</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Prepare enviroment</a></li><li><a href="#2">Do simulations with Option D. Selective layer</a></li><li><a href="#3">Do simulations. Concept layer</a></li><li><a href="#4">Test accuracy</a></li><li><a href="#5">Plot concept raster</a></li></ul></div><h2 id="1">Prepare enviroment</h2><pre class="codeinput">clear
+close <span class="string">all</span>
+rng(3)
+path(path,<span class="string">'MatFunc\Simulate'</span>)
+path(path,<span class="string">'MatFunc\Patterns'</span>)
+path(path,<span class="string">'MatFunc\Accuracy'</span>)
+path(path,<span class="string">'MatFunc\Vision'</span>)
+
+n = 20*20;           <span class="comment">% neuron dimension</span>
+A = 6;           <span class="comment">% number of neurons in concept layer</span>
+M = 200;           <span class="comment">% number of neurons in selective layer</span>
+L = 24;          <span class="comment">% number of stimuli</span>
+
+p = zeros(20,20,L);
+s = zeros(n,L);
+Figures = [<span class="string">"Triangle"</span>, <span class="string">"Square"</span>, <span class="string">"Circle"</span>, <span class="string">"One"</span>, <span class="string">"Two"</span>, <span class="string">"Three"</span>];
+idx = 1;
+<span class="comment">% Plot patterns</span>
+clf
+<span class="keyword">for</span> i=1:6
+    <span class="keyword">for</span> j=1:4
+        Img = imread(strcat(Figures(i),int2str(j),<span class="string">'.jpeg'</span>));
+        p(:,:,idx) = imbox(Img,0,i-1); <span class="comment">% center in the image</span>
+        subplot(L/4,4,idx)
+        showPattern(p(:,:,idx));
+        p(:,:,idx) = p(:,:,idx)/norm(p(:,:,idx)); <span class="comment">% normalize</span>
+        aux = p(:,:,idx)';
+        s(:,idx) = aux(:); <span class="comment">% linearize</span>
+        idx = idx + 1;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+sgtitle(<span class="string">"Images used"</span>);
+
+psl = 0.95;       <span class="comment">% selective probability</span>
+Th = sqrt(3)*0.5; <span class="comment">% selective threshold</span>
+pcn = 0.95;       <span class="comment">% concept probability</span>
+Thcn = 0.5;       <span class="comment">% concept threshold</span>
+
+alpha = 20;
+Tmax = 400;       <span class="comment">% max integration time</span>
+
+f = @(t) mod(round(t),L)+1;   <span class="comment">% function defining the stimulus sequence</span>
+
+K = 4; <span class="comment">% associated stimuli. Must be a divisor of readDigits</span>
+
+<span class="comment">% function defining the consectutive signals sequence</span>
+g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1;
+
+delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
+b2 = (Th/delta)^2;  <span class="comment">% beta^2</span>
+
+bcn2 = (Thcn*sqrt(L)*delta*K*gamma(K + 0.5) / <span class="keyword">...</span>
+    (Th*(1-pcn)*(1-delta)*factorial(K-1)*sqrt(M)))^2; <span class="comment">% ???</span>
+
+W0 = 2*rand(n,M) - 1;  <span class="comment">% random neurons</span>
+[~,id] = sort(sum(s'*W0 &gt; Th)); <span class="comment">% sort neurons for convenience</span>
+W0 = W0(:,id);
+</pre><img vspace="5" hspace="5" src="AccuracyImagDigCon_01.png" alt=""> <h2 id="2">Do simulations with Option D. Selective layer</h2><pre class="codeinput">h = 0.005;        <span class="comment">% time step</span>
+d = 150;            <span class="comment">% inhibitory coupling</span>
+
+<span class="comment">% Sensory layer</span>
+W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+figure;
+V = W'*s;
+F = V &gt; Th;
+R = orderRasterPlot(F');
+spy(R);
+title(<span class="string">"Rasterplot selective layer neurons and stimuli they respond to"</span>);
+xlabel(<span class="string">"Neurons"</span>);
+ylabel(<span class="string">"Stimuli"</span>);
+</pre><img vspace="5" hspace="5" src="AccuracyImagDigCon_02.png" alt=""> <h2 id="3">Do simulations. Concept layer</h2><pre class="codeinput">y = max(0,W'*s - Th); <span class="comment">% compute reaction to s</span>
+y = [y; y; y; y];
+
+<span class="comment">%U0 = 2*rand(M,A) - 1;  % random neurons</span>
+<span class="comment">%[~,id] = sort(sum(y'*U0 &gt; Th)); % sort neurons for convenience</span>
+<span class="comment">%U0 = U0(:,id);</span>
+
+<span class="comment">%d = 0; %no inhibition</span>
+
+<span class="comment">% Concept layer</span>
+<span class="comment">%U = SimulateNeurons3(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d);</span>
+
+<span class="comment">% Manually set the values</span>
+U = zeros(M*4,A);
+Thcn = zeros(A,1);
+<span class="keyword">for</span> i=0:A-1
+    aux = sum(y(:,i*K+1:i*K+K),2);
+    U(:,i+1) = aux/norm(aux);
+    v = U(:,i+1)'*y(:,i*K+1:i*K+K);
+    Thcn(i+1) = min(v(v~=0));
+<span class="keyword">end</span>
+</pre><h2 id="4">Test accuracy</h2><pre class="codeinput">p = zeros(20,20,5);
+s2 = zeros(n,5);
+Figures2 = [<span class="string">"Triangle5"</span>, <span class="string">"Square5"</span>, <span class="string">"Circle5"</span>, <span class="string">"One5"</span>, <span class="string">"Two5"</span>, <span class="string">"Three5"</span>];
+figure;
+<span class="keyword">for</span> i=1:6
+    Img = imread(strcat(Figures2(i),<span class="string">'.jpeg'</span>));
+    p(:,:,i) = imbox(Img,0,i-1);
+    subplot(3,2,i)
+    showPattern(p(:,:,i));
+    p(:,:,i) = p(:,:,i)/norm(p(:,:,i)); <span class="comment">% normalize</span>
+    aux = p(:,:,i)';
+    s2(:,i) = aux(:); <span class="comment">% linearize</span>
+<span class="keyword">end</span>
+V2 = W'*s2;
+y2 = max(0,V2 - Th);
+
+Vc2 = U'*[y2;y2;y2;y2]
+F3 = Vc2 &gt;= Thcn
+</pre><pre class="codeoutput">
+Vc2 =
+
+    0.2110         0         0         0    0.0025         0
+         0    0.3683    0.0743         0         0         0
+         0    0.0819    0.2689         0         0         0
+         0         0         0    0.0982    0.0651         0
+         0         0         0    0.0887    0.1038         0
+         0         0         0    0.0253    0.0187    0.1412
+
+
+F3 =
+
+  6&times;6 logical array
+
+   1   0   0   0   0   0
+   0   1   0   0   0   0
+   0   0   1   0   0   0
+   0   0   0   0   0   0
+   0   0   0   0   0   0
+   0   0   0   0   0   0
+
+</pre><img vspace="5" hspace="5" src="AccuracyImagDigCon_03.png" alt=""> <h2 id="5">Plot concept raster</h2><pre class="codeinput">V = U'*y;
+F = V &gt;= Thcn;
+figure
+spy(F');
+title(<span class="string">"Rasterplot concept layer neurons and stimuli they respond to"</span>);
+xlabel(<span class="string">"Neurons"</span>);
+ylabel(<span class="string">"Stimuli"</span>);
+</pre><img vspace="5" hspace="5" src="AccuracyImagDigCon_04.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Script for testing association: raw images
+%
+
+%% Prepare enviroment
+%
+clear
+close all
+rng(3)
+path(path,'MatFunc\Simulate')
+path(path,'MatFunc\Patterns')
+path(path,'MatFunc\Accuracy')
+path(path,'MatFunc\Vision')
+
+n = 20*20;           % neuron dimension
+A = 6;           % number of neurons in concept layer
+M = 200;           % number of neurons in selective layer
+L = 24;          % number of stimuli
+
+p = zeros(20,20,L);
+s = zeros(n,L);
+Figures = ["Triangle", "Square", "Circle", "One", "Two", "Three"];
+idx = 1;
+% Plot patterns
+clf
+for i=1:6
+    for j=1:4
+        Img = imread(strcat(Figures(i),int2str(j),'.jpeg'));
+        p(:,:,idx) = imbox(Img,0,i-1); % center in the image
+        subplot(L/4,4,idx)
+        showPattern(p(:,:,idx));
+        p(:,:,idx) = p(:,:,idx)/norm(p(:,:,idx)); % normalize
+        aux = p(:,:,idx)';
+        s(:,idx) = aux(:); % linearize
+        idx = idx + 1;
+    end
+end
+sgtitle("Images used");
+
+psl = 0.95;       % selective probability
+Th = sqrt(3)*0.5; % selective threshold
+pcn = 0.95;       % concept probability
+Thcn = 0.5;       % concept threshold
+
+alpha = 20;  
+Tmax = 400;       % max integration time
+
+f = @(t) mod(round(t),L)+1;   % function defining the stimulus sequence
+
+K = 4; % associated stimuli. Must be a divisor of readDigits
+
+% function defining the consectutive signals sequence
+g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1; 
+
+delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
+b2 = (Th/delta)^2;  % beta^2
+
+bcn2 = (Thcn*sqrt(L)*delta*K*gamma(K + 0.5) / ...
+    (Th*(1-pcn)*(1-delta)*factorial(K-1)*sqrt(M)))^2; % ???
+
+W0 = 2*rand(n,M) - 1;  % random neurons
+[~,id] = sort(sum(s'*W0 > Th)); % sort neurons for convenience
+W0 = W0(:,id);
+
+%% Do simulations with Option D. Selective layer
+%
+h = 0.005;        % time step
+d = 150;            % inhibitory coupling
+
+% Sensory layer
+W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+figure;
+V = W'*s;
+F = V > Th;
+R = orderRasterPlot(F');
+spy(R);
+title("Rasterplot selective layer neurons and stimuli they respond to");
+xlabel("Neurons");
+ylabel("Stimuli");
+
+%% Do simulations. Concept layer
+
+y = max(0,W'*s - Th); % compute reaction to s
+y = [y; y; y; y];
+
+%U0 = 2*rand(M,A) - 1;  % random neurons
+%[~,id] = sort(sum(y'*U0 > Th)); % sort neurons for convenience
+%U0 = U0(:,id);
+
+%d = 0; %no inhibition
+
+% Concept layer
+%U = SimulateNeurons3(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d);
+
+% Manually set the values
+U = zeros(M*4,A);
+Thcn = zeros(A,1);
+for i=0:A-1
+    aux = sum(y(:,i*K+1:i*K+K),2);
+    U(:,i+1) = aux/norm(aux);
+    v = U(:,i+1)'*y(:,i*K+1:i*K+K);
+    Thcn(i+1) = min(v(v~=0));
+end
+
+%% Test accuracy
+
+p = zeros(20,20,5);
+s2 = zeros(n,5);
+Figures2 = ["Triangle5", "Square5", "Circle5", "One5", "Two5", "Three5"];
+figure;
+for i=1:6
+    Img = imread(strcat(Figures2(i),'.jpeg'));
+    p(:,:,i) = imbox(Img,0,i-1);
+    subplot(3,2,i)
+    showPattern(p(:,:,i));
+    p(:,:,i) = p(:,:,i)/norm(p(:,:,i)); % normalize
+    aux = p(:,:,i)';
+    s2(:,i) = aux(:); % linearize
+end
+V2 = W'*s2;
+y2 = max(0,V2 - Th);
+
+Vc2 = U'*[y2;y2;y2;y2]
+F3 = Vc2 >= Thcn
+
+%% Plot concept raster
+
+V = U'*y;
+F = V >= Thcn;
+figure
+spy(F');
+title("Rasterplot concept layer neurons and stimuli they respond to");
+xlabel("Neurons");
+ylabel("Stimuli");
+##### SOURCE END #####
+--></body></html>
