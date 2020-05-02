@@ -1,6 +1,16 @@
-%% Script for testing complex pattern recognition: digits
+%% Script for first steps towards conceptual layer: digits
 %
-
+% Jan. 30, 2020 ver 0.1
+%   
+% We use as stimuli the digits of MINST and see the results of conceptual
+% learning with manually set weights for Option D:
+%
+% Even though the conceptual layer learns very well the different stimuli,
+% it fails at classifying new examples. This leads to two conclusions:
+%
+% 1) Make digits more similar between them and a bigger dataset
+% 2) Study lowering Tchn to avoid overfit to training examples
+%
 %% Prepare enviroment
 %
 clear
@@ -13,7 +23,7 @@ path(path,'MINST')
 readDigits = 20;
 
 n = 20*20;           % neuron dimension
-A = 5;           % number of neurons in concept layer
+A = 10;           % number of neurons in concept layer
 M = 400;           % number of neurons in selective layer
 L = readDigits;          % number of stimuli
 
@@ -27,7 +37,8 @@ for i=1:readDigits
 end
 sgtitle("Patterns used");
 
-for j=1:readDigits
+s = zeros(n,L);
+for j=1:L
     p(:,:,j) = p(:,:,j)/norm(p(:,:,j)); % normalize
     aux = p(:,:,j)';
     s(:,j) = aux(:); % linearize
@@ -43,7 +54,7 @@ Tmax = 400;       % max integration time
 
 f = @(t) mod(round(t),L)+1;   % function defining the stimulus sequence
 
-K = 4; % associated stimuli. Must be a divisor of readDigits
+K = 2; % associated stimuli. Must be a divisor of readDigits
 
 % function defining the consectutive signals sequence
 g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1; 
@@ -60,11 +71,13 @@ W0 = W0(:,id);
 
 %% Do simulations with Option C. Selective layer
 %
-h = 0.005;        % time step (better to decrease)
+h = 0.005;        % time step 
 d = 150;            % inhibitory coupling
 
 % Sensory layer
 W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
+
+%% Plot selective layer
 
 figure;
 V = W'*s;
@@ -75,7 +88,7 @@ title("Rasterplot selective layer neurons and stimuli they respond to");
 xlabel("Neurons");
 ylabel("Stimuli");
 
-%% Do simulations. Concept layer
+%% Do simulations. Concept layer manually set
 
 y = max(0,W'*s - Th); % compute reaction to s
 y = [y; y; y; y];
@@ -84,63 +97,43 @@ y = [y; y; y; y];
 % Manually set the values
 U = zeros(M*4,A);
 Thcn = zeros(A,1);
-Thcn2 = zeros(A,1);
 for i=0:A-1
     aux = sum(y(:,i*K+1:i*K+K),2);
     U(:,i+1) = aux/norm(aux);
     v = U(:,i+1)'*y(:,i*K+1:i*K+K);
-    Thcn2(i+1) = min(v);
     Thcn(i+1) = min(v(v~=0));
 end
 
-[p, ~] = readMNIST("train-images.idx3-ubyte","train-labels.idx1-ubyte", 4, 370);
-n3 = matfile('Number3.mat');
-p(:,:,5) = n3.ans;
-s2 = zeros(400,5);
-for j=1:5
-    p(:,:,j) = p(:,:,j)/norm(p(:,:,j)); % normalize
-    aux = p(:,:,j)';
-    s2(:,j) = aux(:); % linearize
-end
-V2 = W'*s2;
-y2 = max(0,V2 - Th);
-
-F3 = U'*[y2;y2;y2;y2] >= Thcn
-figure()
-for i=1:5
-   subplot(4,10,i)
-   showPattern(p(:,:,i));
-end
-sgtitle("Patterns used")
-%U0 = 2*rand(M,A) - 1;  % random neurons
-%[~,id] = sort(sum(y'*U0 > Th)); % sort neurons for convenience
-%U0 = U0(:,id);
-
-%d = 0; %no inhibition
-
-% Concept layer
-%U = SimulateNeurons3(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d);
-
-% Plot raster
-figure;
+%% Plot concept layer
+figure
 V = U'*y;
 F = V >= Thcn;
-F2 = V >= Thcn2;
-%% R = orderRasterPlot(F');
-figure
 spy(F');
 title("Rasterplot concept layer neurons and stimuli they respond to");
 xlabel("Neurons");
 ylabel("Stimuli");
 
-%% Do simulations with Option D. 
-%
-% d = 150;
-% 
-% % Option D
-% 
-% W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
-% 
-% acD = accuracy(W,s,Th);
+%% Test examples
+[p, ~] = readMNIST("train-images.idx3-ubyte","train-labels.idx1-ubyte", 4, 370);
+s2 = zeros(400,5);
+for j=1:4
+    p(:,:,j) = p(:,:,j)/norm(p(:,:,j)); % normalize
+    aux = p(:,:,j)';
+    s2(:,j) = aux(:); % linearize
+end
+
+figure()
+for i=1:4
+   subplot(4,10,i)
+   showPattern(p(:,:,i));
+end
+sgtitle("Test patterns used")
+
+V2 = W'*s2;
+y2 = max(0,V2 - Th);
+V2cn = U'*[y2;y2;y2;y2];
+F2cn = V2cn >= Thcn; 
+disp(V2cn) % output reaction to test examples
+disp(F2cn)
 
 
