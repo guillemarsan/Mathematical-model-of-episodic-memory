@@ -1,6 +1,6 @@
-function pred = predict(V,W,s,Th);
-    % Function which, given a stimulus s, predicts 
-    % the number of the stimulus
+function pred = predict(V,W,s,Th)
+    % Function which, given a stimulus s, tries to predict
+    % the number of the stimulus with the activation of the selective layer
     %
     % Inputs
     %   V = MxL matrix representing the reponse of 
@@ -18,7 +18,6 @@ function pred = predict(V,W,s,Th);
     idx = find(y > 0); % find which neurons respond at all
     F = (V > Th)';
     numstim = sum(F,1);
-    pred = 0;
     
     
     [~,l] = size(idx);
@@ -41,7 +40,6 @@ function pred = predict(V,W,s,Th);
     
 
     if ind ~= 0
-        r = randi([1, best],1,1); % choose randomly from the stimuli it is active to
         fin = find(F(:,idx(i)) == 1,best);
         pred = fin(best);
         return;
