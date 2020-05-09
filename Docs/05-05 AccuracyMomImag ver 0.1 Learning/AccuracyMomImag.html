@@ -1,0 +1,351 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Script for testing association: image moments</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-05"><meta name="DC.source" content="AccuracyMomImag.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Script for testing association: image moments</h1><!--introduction--><p>We use the function 'moments' to compute the invariant moments of the images and use this values as stimuli for the model. When the concept layer weights U are manually set, the results are excellent. However, when they are adquired through the learning rule no desired pattern emerges.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Prepare enviroment</a></li><li><a href="#2">Do simulations with Option D. Selective layer</a></li><li><a href="#3">Plot selective layer</a></li><li><a href="#4">Do simulations. Concept layer</a></li><li><a href="#5">Plot concept layer</a></li><li><a href="#6">Test examples</a></li></ul></div><h2 id="1">Prepare enviroment</h2><pre class="codeinput">clear
+close <span class="string">all</span>
+rng(3)
+path(path,<span class="string">'Images'</span>)
+path(path,<span class="string">'MatFunc/Vision'</span>)
+path(path,<span class="string">'MatFunc/Simulate'</span>)
+path(path,<span class="string">'MatFunc/Accuracy'</span>)
+path(path,<span class="string">'MINST'</span>)
+
+signa = 400;
+n = signa + 9; <span class="comment">% neuron dimension = radius signature steps + 9 moments</span>
+A = 1500;            <span class="comment">% number of neurons in concept layer</span>
+M = 3000;          <span class="comment">% number of neurons in selective layer</span>
+L = 20;
+
+mom = zeros(n,L);
+s = zeros(n,L);
+Figures = [<span class="string">"One"</span>, <span class="string">"Two"</span>, <span class="string">"Three"</span>, <span class="string">"Four"</span>, <span class="string">"Five"</span>];
+k = 1;
+<span class="keyword">for</span> i = 1:5
+    <span class="keyword">for</span> j = 1:4
+        Img = imread(strcat(Figures(i),int2str(j),<span class="string">'.jpeg'</span>));
+        <span class="comment">% Compute the moments</span>
+        [mom(1,k),mom(2,k),mom(3:9,k),mom(10:n,k)] = moments(Img,signa,0);
+
+        <span class="comment">% Scale up the moments</span>
+        <span class="comment">% mom(10:n,k) = aux;</span>
+        mom(1,k) = mom(1,k) * 100;
+        <span class="comment">% mom(2,k) = mom(2,k) / 100;</span>
+        <span class="comment">% mom(3:9,k)= mom(3:9,k) / 100;</span>
+        mom(10:n,k) = mom(10:n,k) * 100;
+        s(:,k) = abs(mom(:,k)) / norm(mom(:,k));
+        k = k+1;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+psl = 0.9;       <span class="comment">% selective probability</span>
+Th = 1;         <span class="comment">% selective threshold</span>
+pcn = 0.9;       <span class="comment">% concept probability</span>
+Thcn = 0.1; <span class="comment">% concept threshold</span>
+
+alpha = 20;
+Tmax = 400;       <span class="comment">% max integration time</span>
+
+f = @(t) mod(round(t),L)+1;   <span class="comment">% function defining the stimulus sequence</span>
+
+K = 4; <span class="comment">% associated stimuli. Must be a divisor of readDigits</span>
+
+<span class="comment">% function defining the consectutive signals sequence</span>
+g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1;
+
+delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
+b2 = (Th/delta)^2;  <span class="comment">% beta^2</span>
+
+bcn2 = (Thcn*sqrt(L)*delta*K*gamma(K + 0.5) / <span class="keyword">...</span>
+    (Th*(1-pcn)*(1-delta)*factorial(K-1)*sqrt(M)))^2; <span class="comment">% ???</span>
+
+W0 = 2*rand(n,M) - 1;  <span class="comment">% random neurons</span>
+[~,id] = sort(sum(s'*W0 &gt; Th)); <span class="comment">% sort neurons for convenience</span>
+W0 = W0(:,id);
+</pre><h2 id="2">Do simulations with Option D. Selective layer</h2><pre class="codeinput">h = 0.005;        <span class="comment">% time step (better to decrease)</span>
+d = 150;          <span class="comment">% inhibitory coupling</span>
+loc = M/20;       <span class="comment">% locality of inhibition</span>
+
+<span class="comment">% Sensory layer with locality</span>
+W = SimulateNeurons4Loc(Tmax, h, W0, s, f, alpha, b2, Th, d, loc);
+</pre><h2 id="3">Plot selective layer</h2><pre class="codeinput">figure;
+V = W'*s;
+F = V &gt; Th;
+R = orderRasterPlot(F');
+spy(R);
+title(<span class="string">"Rasterplot selective layer neurons and stimuli they respond to"</span>);
+xlabel(<span class="string">"Neurons"</span>);
+ylabel(<span class="string">"Stimuli"</span>);
+</pre><img vspace="5" hspace="5" src="AccuracyMomImag_01.png" alt=""> <h2 id="4">Do simulations. Concept layer</h2><pre class="codeinput">y = max(0,W'*s - Th); <span class="comment">% compute reaction to s</span>
+<span class="comment">% y = y.*(y &gt; epsilon); % avoid round to zero problems</span>
+
+<span class="comment">% Hebbian learning</span>
+U0 = 2*rand(M,A) - 1;  <span class="comment">% random neurons</span>
+[~,id] = sort(sum(y'*U0 &gt; Thcn)); <span class="comment">% sort neurons for convenience</span>
+U0 = U0(:,id);
+
+d = 0; <span class="comment">%no inhibition</span>
+
+<span class="comment">% Concept layer</span>
+U = SimulateNeurons(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d);
+
+<span class="comment">% Manually set the values</span>
+<span class="comment">% U = zeros(M,A);</span>
+<span class="comment">% Thcn = zeros(A,1);</span>
+<span class="comment">% for i=0:A-1</span>
+<span class="comment">%     aux = sum(y(:,i*K+1:i*K+K),2);</span>
+<span class="comment">%     U(:,i+1) = aux/norm(aux);</span>
+<span class="comment">%     v = U(:,i+1)'*y(:,i*K+1:i*K+K);</span>
+<span class="comment">%     Thcn(i+1) = min(v(v~=0));</span>
+<span class="comment">% end</span>
+</pre><img vspace="5" hspace="5" src="AccuracyMomImag_02.png" alt=""> <h2 id="5">Plot concept layer</h2><pre class="codeinput">V = U'*y;
+F = V &gt;= Thcn;
+figure
+spy(F');
+title(<span class="string">"Rasterplot concept layer neurons and stimuli they respond to"</span>);
+xlabel(<span class="string">"Neurons"</span>);
+ylabel(<span class="string">"Stimuli"</span>);
+</pre><img vspace="5" hspace="5" src="AccuracyMomImag_03.png" alt=""> <h2 id="6">Test examples</h2><pre class="codeinput">mom2 = zeros(n,5);
+s2 = zeros(n,5);
+Figures2 = [<span class="string">"One5"</span>, <span class="string">"Two5"</span>, <span class="string">"Three5"</span>, <span class="string">"Four5"</span>, <span class="string">"Five5"</span>];
+<span class="keyword">for</span> i=1:5
+    Img = imread(strcat(Figures2(i),<span class="string">'.jpeg'</span>));
+    [mom2(1,i),mom2(2,i),mom2(3:9,i)] = moments(Img,signa,0);
+    mom2(10:n,i) = mom(10:n,(4*i));
+    s2(:,i) = abs(mom2(:,i)) / norm(mom2(:,i));
+<span class="keyword">end</span>
+V2 = W'*s2;
+y2 = max(0,V2 - Th);
+
+Vcn2 = U'*y2;
+F3 = Vcn2 &gt;= Thcn;
+disp(<span class="string">"Reaction of concept layer to test examples (first 10 neurons):"</span>)
+disp(F3(1:10,:))
+</pre><pre class="codeoutput">Reaction of concept layer to test examples (first 10 neurons):
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Script for testing association: image moments
+%
+% We use the function 'moments' to compute the invariant moments of the 
+% images and use this values as stimuli for the model. 
+% When the concept layer weights U are manually set, the results are 
+% excellent. However, when they are adquired through the learning rule no 
+% desired pattern emerges. 
+%
+
+%% Prepare enviroment
+%
+clear
+close all
+rng(3) 
+path(path,'Images')
+path(path,'MatFunc/Vision')
+path(path,'MatFunc/Simulate')
+path(path,'MatFunc/Accuracy')
+path(path,'MINST')
+
+signa = 400;
+n = signa + 9; % neuron dimension = radius signature steps + 9 moments
+A = 1500;            % number of neurons in concept layer
+M = 3000;          % number of neurons in selective layer
+L = 20;
+
+mom = zeros(n,L);
+s = zeros(n,L);
+Figures = ["One", "Two", "Three", "Four", "Five"];
+k = 1;
+for i = 1:5   
+    for j = 1:4
+        Img = imread(strcat(Figures(i),int2str(j),'.jpeg'));
+        % Compute the moments
+        [mom(1,k),mom(2,k),mom(3:9,k),mom(10:n,k)] = moments(Img,signa,0);
+        
+        % Scale up the moments
+        % mom(10:n,k) = aux;
+        mom(1,k) = mom(1,k) * 100;
+        % mom(2,k) = mom(2,k) / 100;
+        % mom(3:9,k)= mom(3:9,k) / 100;
+        mom(10:n,k) = mom(10:n,k) * 100;
+        s(:,k) = abs(mom(:,k)) / norm(mom(:,k));
+        k = k+1;
+    end
+end
+
+psl = 0.9;       % selective probability
+Th = 1;         % selective threshold
+pcn = 0.9;       % concept probability
+Thcn = 0.1; % concept threshold
+
+alpha = 20;  
+Tmax = 400;       % max integration time
+
+f = @(t) mod(round(t),L)+1;   % function defining the stimulus sequence
+
+K = 4; % associated stimuli. Must be a divisor of readDigits
+
+% function defining the consectutive signals sequence
+g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1; 
+
+delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
+b2 = (Th/delta)^2;  % beta^2
+
+bcn2 = (Thcn*sqrt(L)*delta*K*gamma(K + 0.5) / ...
+    (Th*(1-pcn)*(1-delta)*factorial(K-1)*sqrt(M)))^2; % ???
+
+W0 = 2*rand(n,M) - 1;  % random neurons
+[~,id] = sort(sum(s'*W0 > Th)); % sort neurons for convenience
+W0 = W0(:,id);
+
+%% Do simulations with Option D. Selective layer
+%
+h = 0.005;        % time step (better to decrease)
+d = 150;          % inhibitory coupling
+loc = M/20;       % locality of inhibition
+
+% Sensory layer with locality
+W = SimulateNeurons4Loc(Tmax, h, W0, s, f, alpha, b2, Th, d, loc);
+
+%% Plot selective layer
+figure;
+V = W'*s;
+F = V > Th;
+R = orderRasterPlot(F');
+spy(R);
+title("Rasterplot selective layer neurons and stimuli they respond to");
+xlabel("Neurons");
+ylabel("Stimuli");
+
+%% Do simulations. Concept layer
+
+y = max(0,W'*s - Th); % compute reaction to s
+% y = y.*(y > epsilon); % avoid round to zero problems
+
+% Hebbian learning
+U0 = 2*rand(M,A) - 1;  % random neurons
+[~,id] = sort(sum(y'*U0 > Thcn)); % sort neurons for convenience
+U0 = U0(:,id);
+
+d = 0; %no inhibition
+
+% Concept layer
+U = SimulateNeurons(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d);
+
+% Manually set the values
+% U = zeros(M,A);
+% Thcn = zeros(A,1);
+% for i=0:A-1
+%     aux = sum(y(:,i*K+1:i*K+K),2);
+%     U(:,i+1) = aux/norm(aux);
+%     v = U(:,i+1)'*y(:,i*K+1:i*K+K);
+%     Thcn(i+1) = min(v(v~=0));
+% end
+
+%% Plot concept layer
+V = U'*y;
+F = V >= Thcn;
+figure
+spy(F');
+title("Rasterplot concept layer neurons and stimuli they respond to");
+xlabel("Neurons");
+ylabel("Stimuli");
+
+%% Test examples
+mom2 = zeros(n,5);
+s2 = zeros(n,5);
+Figures2 = ["One5", "Two5", "Three5", "Four5", "Five5"];
+for i=1:5
+    Img = imread(strcat(Figures2(i),'.jpeg'));
+    [mom2(1,i),mom2(2,i),mom2(3:9,i)] = moments(Img,signa,0);
+    mom2(10:n,i) = mom(10:n,(4*i));
+    s2(:,i) = abs(mom2(:,i)) / norm(mom2(:,i));
+end
+V2 = W'*s2;
+y2 = max(0,V2 - Th);
+
+Vcn2 = U'*y2;
+F3 = Vcn2 >= Thcn;
+disp("Reaction of concept layer to test examples (first 10 neurons):")
+disp(F3(1:10,:))
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>
