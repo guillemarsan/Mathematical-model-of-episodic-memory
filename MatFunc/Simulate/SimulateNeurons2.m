@@ -22,10 +22,8 @@ x = sum(x,2);   % sum of several simultaneous inputs (if exist)
 v = w'*x;       % membrane potential
 y = max(0, v - Th - dS); % neuronal response
 
-dw = zeros(size(w)); % derivative of weights (without alpha)
-for k = 1:size(w,2)
-    dw(:,k) = y(k)*(b2*x - v(k)*w(:,k));
-end
+% derivative of weights (without alpha)
+dw = y' .* (b2*x - v'.*w);
 
 if(sum(sum(isnan(dw))) > 0) %check is there are NaN in the weights
     disp('Error');

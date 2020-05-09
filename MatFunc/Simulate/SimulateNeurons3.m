@@ -17,12 +17,10 @@ function dw = EvRHS(w, x, Th, b2, d)
 x = sum(x,2);   % sum of several simultaneous inputs (if exist)
 v = w'*x;       % membrane potential
 y = max(0, v - Th); % neuronal response
-dw = zeros(size(w)); % derivative of weights (without alpha)
 
 dum = b2 - d*(sum(y) - y); % new term
-for k = 1:size(w,2)
-    dw(:,k) = y(k)*(dum(k)*x - v(k)*w(:,k));
-end
+% derivative of weights (without alpha)
+dw = y' .* (dum*x - v'.*w);
 end
 
 
