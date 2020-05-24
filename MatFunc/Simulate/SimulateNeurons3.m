@@ -20,7 +20,7 @@ y = max(0, v - Th); % neuronal response
 
 dum = b2 - d*(sum(y) - y); % new term
 % derivative of weights (without alpha)
-dw = y' .* (dum*x - v'.*w);
+dw = y' .* ((dum*x')' - v'.*w);
 end
 
 
