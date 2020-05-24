@@ -52,17 +52,18 @@ function [e,mom1,ph,distances] = moments(Im, signa,plotop)
         scatter(boundary{1}(:,2),boundary{1}(:,1),'.','r','LineWidth',0.001);
     end
     distances = sqrt((x - c(1)).^2 + (y - c(2)).^2);
-    [~,argmax] = max(distances);
-    pts = length(distances);
-    distances = circshift(distances,pts-argmax+1);
     distances = distances / max(distances);
+    
     % Pick only signa points
-    step = fix(pts/signa);
-    offset = rem(pts,signa);
-    distances = distances(1:step:pts-offset);
+    pts = length(distances);
+    step = 1/pts;
+    distances = interp1(0:step:1-step,distances,0:1/signa:1-step);
+    
     % Far-close adaptation
-    distances(distances > 0.5) = 1;
-    distances(distances < 0.5) = 0;
+    distances(distances > 0.7) = 1;
+    distances(distances < 0.7) = 0.5;
+    distances(distances < 0.3) = 0;
+    
     % Scale up
     distances = distances * 100;
 end
