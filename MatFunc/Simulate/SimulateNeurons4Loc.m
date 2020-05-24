@@ -14,11 +14,6 @@ for k = 1:K-1
     % Update new term
     vin = zeros(size(y,1),1);
 
-    % With hard boundary
-%     for l = 1:loc:size(y,1)-loc+1
-%       vin(l:(l+loc-1)) = d*(sum(y(l:(l+loc-1)).^2) - sum(y(l:(l+loc-1)))*y(l:(l+loc-1)));
-%     end
-
     % With moving window
     vin = d*(movsum(y.^2,loc) - movsum(y,loc).*y);
    

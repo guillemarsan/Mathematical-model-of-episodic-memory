@@ -53,8 +53,7 @@ f = @(t) mod(round(2*t),L)+1;   % function defining the stimulus sequence
 alpha = 20;  
 
 psl = 0.975;       % selective probability
-delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
-b2 = (Th/delta)^2;  % beta^2
+b2 = 0.7;
 
 
 % Set and train the sensory layer with locality
@@ -88,11 +87,7 @@ g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1;
 alpha = 20; 
 
 pcn = 0.95; % conceptual probability
-% delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
-% bcn2 = (Thcn*sqrt(L)*delta*K*gamma(K + 0.5) / ...
-%     (Th*(1-pcn)*(1-delta)*factorial(K-1)*sqrt(M)))^2; 
-deltacn = sqrt(1 - (2*norminv(psl) / sqrt(5*M)));
-bcn2 = (Th/deltacn)^2;  % beta^2
+bcn2 = 0.7;
 
 y = max(0,W'*s - Th); % compute reaction to s
 
@@ -101,22 +96,11 @@ U0 = 2*rand(M,A) - 1;  % random neurons
 [~,id] = sort(sum(y'*U0 > Thcn)); % sort neurons for convenience
 U0 = U0(:,id);
 
+loc = A/20;
 d = 150; %no inhibition
 
 % Concept layer
-U = SimulateNeurons4(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d);
-
-% Manually set the values
-% A = 5;
-% K = 1;
-% U = zeros(M,A);
-% Thcn = zeros(A,1);
-% for i=0:A-1
-%     aux = sum(y(:,i*K+1:i*K+K),2);
-%     U(:,i+1) = aux/norm(aux);
-%     v = U(:,i+1)'*y(:,i*K+1:i*K+K);
-%     Thcn(i+1) = min(v(v~=0));
-% end
+U = SimulateNeurons4Loc(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d, loc);
 
 %% Plot concept layer
 V = U'*y;

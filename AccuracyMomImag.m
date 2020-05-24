@@ -105,24 +105,6 @@ d = 150; % no inhibition
 % Concept layer
 U = SimulateNeurons4Loc(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d, loc);
 
-% loc = A/20;
-% d = 150; % inhibition
-% 
-% % Concept layer
-% U = SimulateNeurons4Loc(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d,loc);
-
-% Manually set the values
-% A = 5;
-% K = 1;
-% U = zeros(M,A);
-% Thcn = zeros(A,1);
-% for i=0:A-1
-%     aux = sum(y(:,i*K+1:i*K+K),2);
-%     U(:,i+1) = aux/norm(aux);
-%     v = U(:,i+1)'*y(:,i*K+1:i*K+K);
-%     Thcn(i+1) = min(v(v~=0));
-% end
-
 %% Plot concept layer
 
 V = U'*y;
@@ -134,6 +116,8 @@ daspect([10 1 100]);
 title("Rasterplot concept layer neurons and stimuli they respond to");
 xlabel("Neurons");
 ylabel("Stimuli");
+
+return
 
 %% Read test examples
 
