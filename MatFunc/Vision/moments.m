@@ -1,4 +1,4 @@
-function [e,mom1,ph,distances] = moments(Im, signa,plotop)
+function mom = moments(Im, signa,plotop)
     % Function which computes the invariant moments of the red element 
     % of an image
     %
@@ -7,11 +7,12 @@ function [e,mom1,ph,distances] = moments(Im, signa,plotop)
     %   signa = number of points of radius signature to return
     %   plotop = option to plot the transformations
     % Outputs
-    %   e = eccentricity
-    %   mom1 = perimeter^2/area
-    %   ph = Hu invaraints
-    %   distances = array of signa elements of equally distributed points
-    %   of the radius signature (with adaptation far-close)
+    %   mom = a 409x1 vector formed by:
+    %       e = eccentricity
+    %       mom1 = perimeter^2/area
+    %       ph = Hu invaraints
+    %       distances = array of signa elements of equally distributed points
+    %       of the radius signature (with adaptation far-close)
     
     % Color mask
     redness = double(Im(:,:,1)) - max(double(Im(:,:,2)),double(Im(:,:,3)));
@@ -66,4 +67,7 @@ function [e,mom1,ph,distances] = moments(Im, signa,plotop)
     
     % Scale up
     distances = distances * 100;
+    
+    % Output
+    mom = [e;mom1;ph(:);distances(:)];
 end
