@@ -1,4 +1,4 @@
-function pred = predictcon(W,U,s,Th,Thcn)
+function pred = predictcon(W,U,s,Th,Thcn,dict)
     % Function which, given a stimulus s, tries to predict
     % the class of it with the concept layer
     %
@@ -8,16 +8,18 @@ function pred = predictcon(W,U,s,Th,Thcn)
     %   s = nx1 stimulus shown
     %   Th = threshold selective layer
     %   Thcn = threshol concept layer
+    %   dict = 1xa array that tags each conceptual neuron to the concept
     % Outputs
     %   pred = guess of the class
     
     y = max(0,W'*s - Th);   % compute selective activation
     ycn = max(0, U'*y - Thcn);  % compute concept activation
-    k = find(ycn);
-    if isempty(k) || length(k) > 1
+    con = unique(dict(ycn > 0));
+    con(con == -1) = [];
+    if isempty(con) || length(con) > 1
         pred = -1;   % return uncertainity
     else
-        pred = k;   % return guess
+        pred = con;   % return guess
     end
 end
 
