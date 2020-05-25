@@ -63,10 +63,11 @@ W0 = W0(:,id);
 
 W = SimulateNeurons4Loc(Tmax, h, W0, s, f, alpha, b2, Th, d, loc);
 
+%% Plot selective layer
+
 figure('color','w','position',[100 100 1000 600])
 PlotResultsOfSelectiveStratum(s, W0, W, Th)
 
-%% Plot selective layer
 figure;
 V = W'*s;
 F = V > Th;
@@ -103,6 +104,7 @@ d = 150; %no inhibition
 U = SimulateNeurons4Loc(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d, loc);
 
 %% Plot concept layer
+
 V = U'*y;
 F = V >= Thcn;
 R = orderRasterPlot(F');
@@ -113,7 +115,10 @@ title("Rasterplot concept layer neurons and stimuli they respond to");
 xlabel("Neurons");
 ylabel("Stimuli");
 
-return
+%% Generate concept map
+
+dict = conceptmap(F,K);
+
 %% Read test examples
 
 Figures = {'One','Two','Three','Four','Five'};
@@ -130,20 +135,9 @@ s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
 
 %% Compute precision
 
-V2 = W'*s2;
-y2 = max(0,V2 - Th);
-
-Vcn2 = U'*y2;
-F3 = Vcn2 >= Thcn;
-figure
-disp("Reaction of concept layer to test examples:")
-spy(F3')
-daspect([10 1 100]);
-
-% Compute precision
 error = 0;
 for i=1:Lex
-    if predictcon(W,U,s2(:,i),Th,Thcn) ~= i
+    if predictcon(W,U,s2(:,i),Th,Thcn,dict)+1 ~= class(i)
       error = error + 1;
     end
 end

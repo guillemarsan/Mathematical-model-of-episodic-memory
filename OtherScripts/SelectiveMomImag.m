@@ -23,8 +23,8 @@ path(path,'MatFunc/Misc')
 %% Read data
 
 signa = 400;   % radius signature steps (moments)
-FLDR = 'Images/MomTrain';
-Figures = {'One','Two','Three','Four','Five'};
+FLDR = 'Images/All';
+Figures = {'One','Two','Three','Four','Five','Triangle','Square'};
 PlotFLG = true; 
 
 figure('color','w','position',[100 100 900 900])
@@ -34,12 +34,19 @@ figure('color','w','position',[100 100 900 900])
 %% Sensory stimuli (and angles between them)
 
 s = mom;
-[n,~] = size(s);
+[n,L] = size(s);
 s = sqrt(3/n)*(s - mean(s))./std(s);
 
 nrmS = sqrt(sum(s.^2)); % norma s
 S = s./nrmS;
 CosAngle = S'*S; % cos(angle)
+% idx = [1];
+% for i = 2:L
+%     cos = S(:,i)'*S(:,idx);
+%     if ~(max(cos) > 0.6)
+%         idx = [idx,i];
+%     end
+% end
 
 figure('color','w')
 imagesc(CosAngle,[-1 1])

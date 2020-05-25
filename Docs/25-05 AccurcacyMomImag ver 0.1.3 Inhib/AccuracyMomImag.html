@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Script for testing association: image moments</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-23"><meta name="DC.source" content="AccuracyMomImag.m"><style type="text/css">
+      --><title>Script for testing association: image moments</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-25"><meta name="DC.source" content="AccuracyMomImag.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -67,7 +67,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Script for testing association: image moments</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Prepare enviroment</a></li><li><a href="#2">Read training data</a></li><li><a href="#3">Sensory stimuli (and angles between them)</a></li><li><a href="#4">Do simulations with Option D. Selective layer</a></li><li><a href="#5">Plot selective layer</a></li><li><a href="#6">Do simulations. Concept layer</a></li><li><a href="#7">Plot concept layer</a></li><li><a href="#8">Read test examples</a></li><li><a href="#9">Compute precision</a></li></ul></div><h2 id="1">Prepare enviroment</h2><pre class="codeinput">clear
+  </style></head><body><div class="content"><h1>Script for testing association: image moments</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Prepare enviroment</a></li><li><a href="#2">Read training data</a></li><li><a href="#3">Sensory stimuli (and angles between them)</a></li><li><a href="#4">Do simulations with Option D. Selective layer</a></li><li><a href="#5">Plot selective layer</a></li><li><a href="#6">Do simulations. Concept layer</a></li><li><a href="#7">Plot concept layer</a></li><li><a href="#8">Generate concept map</a></li><li><a href="#9">Read test examples</a></li><li><a href="#10">Compute precision</a></li></ul></div><h2 id="1">Prepare enviroment</h2><pre class="codeinput">clear
 close <span class="string">all</span>
 rng(3)
 path(path,<span class="string">'MatFunc/Vision'</span>)
@@ -75,12 +75,12 @@ path(path,<span class="string">'MatFunc/Accuracy'</span>)
 path(path,<span class="string">'MatFunc/Simulate'</span>)
 path(path,<span class="string">'MatFunc/Misc'</span>)
 </pre><h2 id="2">Read training data</h2><pre class="codeinput">signa = 400;   <span class="comment">% radius signature steps (moments)</span>
-Figures = {<span class="string">'Two'</span>,<span class="string">'Three'</span>,<span class="string">'Four'</span>,<span class="string">'Five'</span>,<span class="string">'Triangle'</span>,<span class="string">'One'</span>};
+Figures = {<span class="string">'One'</span>,<span class="string">'Two'</span>,<span class="string">'Three'</span>,<span class="string">'Four'</span>,<span class="string">'Square'</span>,<span class="string">'Triangle'</span>};
 FLDR = <span class="string">'Images/MomTrain'</span>;
-PlotFLG = false;
+PlotFLG = true;
 
 figure(<span class="string">'color'</span>,<span class="string">'w'</span>,<span class="string">'position'</span>,[100 100 900 900])
-[mom, class] = ImportImagesEvalMoments(FLDR, Figures, signa, PlotFLG);
+mom = ImportImagesEvalMoments(FLDR, Figures, signa, PlotFLG);
 </pre><img vspace="5" hspace="5" src="AccuracyMomImag_01.png" alt=""> <h2 id="3">Sensory stimuli (and angles between them)</h2><pre class="codeinput">s = mom;
 [n,~] = size(s);
 s = sqrt(3/n)*(s - mean(s))./std(s);
@@ -108,8 +108,7 @@ f = @(t) mod(round(2*t),L)+1;   <span class="comment">% function defining the st
 alpha = 20;
 
 psl = 0.975;       <span class="comment">% selective probability</span>
-delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
-b2 = (Th/delta)^2;  <span class="comment">% beta^2</span>
+b2 = 0.7;
 
 
 <span class="comment">% Set and train the sensory layer with locality</span>
@@ -132,19 +131,14 @@ xlabel(<span class="string">"Neurons"</span>);
 ylabel(<span class="string">"Stimuli"</span>);
 </pre><img vspace="5" hspace="5" src="AccuracyMomImag_04.png" alt=""> <h2 id="6">Do simulations. Concept layer</h2><pre class="codeinput">rng(3)
 A = 600;       <span class="comment">% number of neurons in the selective layer</span>
-K = 3;          <span class="comment">% integration</span>
+K = 2;          <span class="comment">% integration</span>
 Thcn = 0.5;     <span class="comment">% conceptual threshold</span>
 <span class="comment">% function defining the consectutive signals sequence</span>
 g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1;
 alpha = 20;
 
 pcn = 0.975; <span class="comment">% selective probability</span>
-<span class="comment">% delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));</span>
-<span class="comment">% bcn2 = (Thcn*sqrt(L)*delta*K*gamma(K + 0.5) / ...</span>
-<span class="comment">%     (Th*(1-pcn)*(1-delta)*factorial(K-1)*sqrt(M)))^2;</span>
-delta = sqrt(1 - (2*norminv(pcn) / sqrt(5*M)));
-bcn2 = (Th/delta)^2;
-
+bcn2 = 0.3;
 
 y = max(0,W'*s - Th); <span class="comment">% compute reaction to s</span>
 
@@ -158,27 +152,7 @@ d = 150; <span class="comment">% no inhibition</span>
 
 <span class="comment">% Concept layer</span>
 U = SimulateNeurons4Loc(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d, loc);
-
-<span class="comment">% loc = A/20;</span>
-<span class="comment">% d = 150; % inhibition</span>
-<span class="comment">%</span>
-<span class="comment">% % Concept layer</span>
-<span class="comment">% U = SimulateNeurons4Loc(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d,loc);</span>
-
-<span class="comment">% Manually set the values</span>
-<span class="comment">% A = 5;</span>
-<span class="comment">% K = 1;</span>
-<span class="comment">% U = zeros(M,A);</span>
-<span class="comment">% Thcn = zeros(A,1);</span>
-<span class="comment">% for i=0:A-1</span>
-<span class="comment">%     aux = sum(y(:,i*K+1:i*K+K),2);</span>
-<span class="comment">%     U(:,i+1) = aux/norm(aux);</span>
-<span class="comment">%     v = U(:,i+1)'*y(:,i*K+1:i*K+K);</span>
-<span class="comment">%     Thcn(i+1) = min(v(v~=0));</span>
-<span class="comment">% end</span>
-</pre><h2 id="7">Plot concept layer</h2><pre class="codeinput"><span class="comment">%s2 = [y(:,1),y(:,1)+y(:,2),y(:,3),y(:,3) + y(:,4),y(:,5),y(:,5)+y(:,6)];</span>
-s2 = y;
-V = U'*s2;
+</pre><h2 id="7">Plot concept layer</h2><pre class="codeinput">V = U'*y;
 F = V &gt;= Thcn;
 R = orderRasterPlot(F');
 figure
@@ -187,9 +161,10 @@ daspect([10 1 100]);
 title(<span class="string">"Rasterplot concept layer neurons and stimuli they respond to"</span>);
 xlabel(<span class="string">"Neurons"</span>);
 ylabel(<span class="string">"Stimuli"</span>);
+</pre><img vspace="5" hspace="5" src="AccuracyMomImag_05.png" alt=""> <h2 id="8">Generate concept map</h2><pre class="codeinput">dict = conceptmap(F,K);
 
 <span class="keyword">return</span>
-</pre><img vspace="5" hspace="5" src="AccuracyMomImag_05.png" alt=""> <h2 id="8">Read test examples</h2><pre class="codeinput">Figures = {<span class="string">'One'</span>,<span class="string">'Two'</span>,<span class="string">'Three'</span>,<span class="string">'Four'</span>,<span class="string">'Five'</span>};
+</pre><h2 id="9">Read test examples</h2><pre class="codeinput">Figures = {<span class="string">'One'</span>,<span class="string">'Two'</span>,<span class="string">'Three'</span>,<span class="string">'Four'</span>,<span class="string">'Square'</span>,<span class="string">'Triangle'</span>};
 FLDR = <span class="string">'Images/MomTest'</span>;
 PlotFLG = true;
 
@@ -199,20 +174,10 @@ figure(<span class="string">'color'</span>,<span class="string">'w'</span>,<span
 s2 = mom;
 [n,Lex] = size(s2);
 s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
-</pre><h2 id="9">Compute precision</h2><pre class="codeinput">V2 = W'*s2;
-y2 = max(0,V2 - Th);
-
-Vcn2 = U'*y2;
-F3 = Vcn2 &gt;= Thcn;
-figure
-disp(<span class="string">"Reaction of concept layer to test examples:"</span>)
-spy(F3)
-daspect([10 1 100]);
-
-<span class="comment">% Compute precision</span>
-error = 0;
+</pre><h2 id="10">Compute precision</h2><pre class="codeinput">error = 0;
+class =[0,0,1,1,2,2];
 <span class="keyword">for</span> i=1:Lex
-    <span class="keyword">if</span> predictcon(W,U,s2(:,i),Th,Thcn) ~= i
+    <span class="keyword">if</span> predictcon(W,U,s2(:,i),Th,Thcn,dict) ~= class(i)
       error = error + 1;
     <span class="keyword">end</span>
 <span class="keyword">end</span>
@@ -237,12 +202,12 @@ path(path,'MatFunc/Misc')
 %% Read training data
 
 signa = 400;   % radius signature steps (moments)
-Figures = {'Two','Three','Four','Five','Triangle','One'};
+Figures = {'One','Two','Three','Four','Square','Triangle'};
 FLDR = 'Images/MomTrain';
-PlotFLG = false; 
+PlotFLG = true; 
 
 figure('color','w','position',[100 100 900 900])
-[mom, class] = ImportImagesEvalMoments(FLDR, Figures, signa, PlotFLG);
+mom = ImportImagesEvalMoments(FLDR, Figures, signa, PlotFLG);
 
 
 %% Sensory stimuli (and angles between them)
@@ -277,8 +242,7 @@ f = @(t) mod(round(2*t),L)+1;   % function defining the stimulus sequence
 alpha = 20;  
 
 psl = 0.975;       % selective probability
-delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
-b2 = (Th/delta)^2;  % beta^2
+b2 = 0.7;
 
 
 % Set and train the sensory layer with locality
@@ -306,19 +270,14 @@ ylabel("Stimuli");
 
 rng(3)
 A = 600;       % number of neurons in the selective layer
-K = 3;          % integration
+K = 2;          % integration
 Thcn = 0.5;     % conceptual threshold
 % function defining the consectutive signals sequence
 g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1; 
 alpha = 20; 
 
 pcn = 0.975; % selective probability
-% delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
-% bcn2 = (Thcn*sqrt(L)*delta*K*gamma(K + 0.5) / ...
-%     (Th*(1-pcn)*(1-delta)*factorial(K-1)*sqrt(M)))^2; 
-delta = sqrt(1 - (2*norminv(pcn) / sqrt(5*M)));
-bcn2 = (Th/delta)^2;
-
+bcn2 = 0.3;
 
 y = max(0,W'*s - Th); % compute reaction to s
 
@@ -333,29 +292,10 @@ d = 150; % no inhibition
 % Concept layer
 U = SimulateNeurons4Loc(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d, loc);
 
-% loc = A/20;
-% d = 150; % inhibition
-% 
-% % Concept layer
-% U = SimulateNeurons4Loc(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d,loc);
-
-% Manually set the values
-% A = 5;
-% K = 1;
-% U = zeros(M,A);
-% Thcn = zeros(A,1);
-% for i=0:A-1
-%     aux = sum(y(:,i*K+1:i*K+K),2);
-%     U(:,i+1) = aux/norm(aux);
-%     v = U(:,i+1)'*y(:,i*K+1:i*K+K);
-%     Thcn(i+1) = min(v(v~=0));
-% end
 
 %% Plot concept layer
 
-%s2 = [y(:,1),y(:,1)+y(:,2),y(:,3),y(:,3) + y(:,4),y(:,5),y(:,5)+y(:,6)];
-s2 = y;
-V = U'*s2;
+V = U'*y;
 F = V >= Thcn;
 R = orderRasterPlot(F');
 figure
@@ -365,11 +305,15 @@ title("Rasterplot concept layer neurons and stimuli they respond to");
 xlabel("Neurons");
 ylabel("Stimuli");
 
+%% Generate concept map
+
+dict = conceptmap(F,K);
+
 return
 
 %% Read test examples
 
-Figures = {'One','Two','Three','Four','Five'};
+Figures = {'One','Two','Three','Four','Square','Triangle'};
 FLDR = 'Images/MomTest';
 PlotFLG = true; 
 
@@ -383,20 +327,10 @@ s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
 
 %% Compute precision
 
-V2 = W'*s2;
-y2 = max(0,V2 - Th);
-
-Vcn2 = U'*y2;
-F3 = Vcn2 >= Thcn;
-figure
-disp("Reaction of concept layer to test examples:")
-spy(F3)
-daspect([10 1 100]);
-
-% Compute precision
 error = 0;
+class =[0,0,1,1,2,2];
 for i=1:Lex
-    if predictcon(W,U,s2(:,i),Th,Thcn) ~= i
+    if predictcon(W,U,s2(:,i),Th,Thcn,dict) ~= class(i)
       error = error + 1;
     end
 end

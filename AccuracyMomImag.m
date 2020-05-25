@@ -15,9 +15,9 @@ path(path,'MatFunc/Misc')
 %% Read training data
 
 signa = 400;   % radius signature steps (moments)
-Figures = {'Two','Three','Four','Five','Triangle','One'};
+Figures = {'One','Two','Three','Four','Square','Triangle'};
 FLDR = 'Images/MomTrain';
-PlotFLG = false; 
+PlotFLG = true; 
 
 figure('color','w','position',[100 100 900 900])
 mom = ImportImagesEvalMoments(FLDR, Figures, signa, PlotFLG);
@@ -83,14 +83,14 @@ ylabel("Stimuli");
 
 rng(3)
 A = 600;       % number of neurons in the selective layer
-K = 3;          % integration
+K = 2;          % integration
 Thcn = 0.5;     % conceptual threshold
 % function defining the consectutive signals sequence
 g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1; 
 alpha = 20; 
 
 pcn = 0.975; % selective probability
-bcn2 = 0.7;
+bcn2 = 0.3;
 
 y = max(0,W'*s - Th); % compute reaction to s
 
@@ -105,6 +105,7 @@ d = 150; % no inhibition
 % Concept layer
 U = SimulateNeurons4Loc(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d, loc);
 
+
 %% Plot concept layer
 
 V = U'*y;
@@ -117,11 +118,15 @@ title("Rasterplot concept layer neurons and stimuli they respond to");
 xlabel("Neurons");
 ylabel("Stimuli");
 
+%% Generate concept map
+
+dict = conceptmap(F,K);
+
 return
 
 %% Read test examples
 
-Figures = {'One','Two','Three','Triangle','Four','Five'};
+Figures = {'One','Two','Three','Four','Square','Triangle'};
 FLDR = 'Images/MomTest';
 PlotFLG = true; 
 
@@ -135,21 +140,10 @@ s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
 
 %% Compute precision
 
-V2 = W'*s2;
-y2 = max(0,V2 - Th);
-
-Vcn2 = U'*y2;
-F3 = Vcn2 >= Thcn;
-figure
-disp("Reaction of concept layer to test examples:")
-spy(F3')
-daspect([10 1 100]);
-
-%% 
-% Compute precision
 error = 0;
+class =[0,0,1,1,2,2];
 for i=1:Lex
-    if predictcon(W,U,s2(:,i),Th,Thcn) ~= i
+    if predictcon(W,U,s2(:,i),Th,Thcn,dict) ~= class(i)
       error = error + 1;
     end
 end

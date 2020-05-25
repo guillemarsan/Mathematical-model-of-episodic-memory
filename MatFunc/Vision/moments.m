@@ -50,24 +50,34 @@ function mom = moments(Im, signa,plotop)
         imshow(FillBiImg);
         hold on
         scatter(c(1),c(2),'x','r');
-        scatter(boundary{1}(:,2),boundary{1}(:,1),'.','r','LineWidth',0.001);
+        scatter(x,y,'.','r','LineWidth',0.001);
+        scatter(x(1:100),y(1:100),'.','g','LineWidth',0.001);
+        scatter(x(100:200),y(100:200),'.','b','LineWidth',0.001);
     end
     distances = sqrt((x - c(1)).^2 + (y - c(2)).^2);
+    
+    % Normalize
     distances = distances / max(distances);
     
-    % Pick only signa points
+    % Shift to maximum
     pts = length(distances);
     step = 1/pts;
+    distances = circshift(distances,pts - find(distances == min(distances),1));
+    
+    % Pick only signa points
     distances = interp1(0:step:1-step,distances,0:1/signa:1-step);
+%     plot(1:400,distances);
+%     hold on;
     
     % Far-close adaptation
     distances(distances > 0.7) = 1;
-    distances(distances < 0.7) = 0.5;
-    distances(distances < 0.3) = 0;
+    distances(distances < 0.7) = 0;
+    distances(distances < 0.3) = -1;
     
     % Scale up
     distances = distances * 100;
     
     % Output
     mom = [e;mom1;ph(:);distances(:)];
+    
 end
