@@ -23,7 +23,7 @@ path(path,'MatFunc/Misc')
 %% Read data
 
 signa = 400;   % radius signature steps (moments)
-FLDR = 'Images/All';
+FLDR = 'Images/MomTrain';
 Figures = {'One','Two','Three','Four','Five','Triangle','Square'};
 PlotFLG = true; 
 
@@ -82,4 +82,6 @@ W0 = W0(:,id);
 W = SimulateNeurons4Loc(Tmax, h, W0, s, f, alpha, b2, Th, d, loc);
 
 figure('color','w','position',[100 100 1000 600])
-PlotResultsOfSelectiveStratum(s, W0, W, Th)
+Resp = s'*W > Th;
+Resp0 = s'*W0 > Th;
+PlotResultsOfSelectiveStratum(s, Resp0, Resp)
