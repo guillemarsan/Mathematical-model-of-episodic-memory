@@ -14,12 +14,12 @@ function pred = predictcon(W,U,s,Th,Thcn,dict)
     
     y = max(0,W'*s - Th);   % compute selective activation
     ycn = max(0, U'*y - Thcn);  % compute concept activation
-    con = unique(dict(ycn > 0));
-    con(con == -1) = [];
-    if isempty(con) || length(con) > 1
+    vot = dict(ycn > 0);
+    con = unique(vot);
+    if con == -1
         pred = -1;   % return uncertainity
     else
-        pred = con;   % return guess
+        pred = mode(vot(vot ~= -1));   % return guess
     end
 end
 

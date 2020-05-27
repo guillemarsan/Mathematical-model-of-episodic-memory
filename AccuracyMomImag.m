@@ -49,7 +49,6 @@ Tmax = 400;       % max integration time
 Th = 0.8;           % selective threshold
 h = 0.0025;        % time step (better to decrease)
 d = 150;          % inhibitory coupling
-loc = M/20;       % locality of inhibition
 [n,L] = size(mom);  % dimension and number of stimuli
 f = @(t) mod(round(2*t),L)+1;   % function defining the stimulus sequence
 alpha = 20;  
@@ -63,16 +62,19 @@ W0 = 2*rand(n,M) - 1;  % random neurons
 [~,id] = sort(sum(s'*W0 > Th)); % sort neurons for convenience
 W0 = W0(:,id);
 
-W = SimulateNeurons4Loc(Tmax, h, W0, s, f, alpha, b2, Th, d, loc);
+W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
 
-figure('color','w','position',[100 100 1000 600])
-PlotResultsOfSelectiveStratum(s, W0, W, Th)
+
 
 %% Plot selective layer
+
+figure('color','w','position',[100 100 1000 600])
+Resp = s'*W > Th;
+Resp0 = s'*W0 > Th;
+PlotResultsOfSelectiveStratum(s, Resp0, Resp)
+
 figure;
-V = W'*s;
-F = V > Th;
-R = orderRasterPlot(F');
+R = orderRasterPlot(Resp);
 spy(R);
 daspect([10 1 100]);
 title("Rasterplot selective layer neurons and stimuli they respond to");
@@ -84,7 +86,7 @@ ylabel("Stimuli");
 rng(3)
 A = 600;       % number of neurons in the selective layer
 K = 2;          % integration
-Thcn = 0.5;     % conceptual threshold
+Thcn = 0.3;     % conceptual threshold
 % function defining the consectutive signals sequence
 g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1; 
 alpha = 20; 
@@ -99,11 +101,10 @@ U0 = 2*rand(M,A) - 1;  % random neurons
 [~,id] = sort(sum(y'*U0 > Thcn)); % sort neurons for convenience
 U0 = U0(:,id);
 
-loc = A/20;
 d = 150; % no inhibition
 
 % Concept layer
-U = SimulateNeurons4Loc(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d, loc);
+U = SimulateNeurons4(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d);
 
 
 %% Plot concept layer
@@ -122,8 +123,6 @@ ylabel("Stimuli");
 
 dict = conceptmap(F,K);
 
-return
-
 %% Read test examples
 
 Figures = {'One','Two','Three','Four','Square','Triangle'};
@@ -133,17 +132,21 @@ PlotFLG = true;
 figure('color','w','position',[100 100 900 900])
 [mom, class] = ImportImagesEvalMoments(FLDR, Figures, signa, PlotFLG);
 
+% Change classes to concept tags
+concpt = zeros(1,length(class));
+for i = 0:(L/K)-1
+    concpt(ismember(class,i*K+1:(i+1)*K)) = i;
+end
+
 s2 = mom;
 [n,Lex] = size(s2);
 s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
 
-
 %% Compute precision
 
 error = 0;
-class =[0,0,1,1,2,2];
 for i=1:Lex
-    if predictcon(W,U,s2(:,i),Th,Thcn,dict) ~= class(i)
+    if predictcon(W,U,s2(:,i),Th,0.1,dict) ~= concpt(i)
       error = error + 1;
     end
 end
