@@ -1,0 +1,244 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Script to locality of inhibition of Option D: image moments</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-27"><meta name="DC.source" content="LocMomImag2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Script to locality of inhibition of Option D: image moments</h1><!--introduction--><p>We compare how different locality of inhibition results in different number of selective neurons. We check as well the difference between having a hard boundary vs window locality.</p><p>rng(3)</p><p>We show that neither of them perform much better than global inhibition</p><p>We use normal activation instead of inhibitory convergence for activation</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Prepare enviroment</a></li><li><a href="#2">Read data</a></li><li><a href="#3">Do simulations with haard boundary and sliding window</a></li><li><a href="#4">Do simulation without locality</a></li><li><a href="#5">Plot results</a></li></ul></div><h2 id="1">Prepare enviroment</h2><pre class="codeinput">clear
+close <span class="string">all</span>
+rng(3)
+path(path,<span class="string">'MatFunc/Vision'</span>)
+path(path,<span class="string">'MatFunc/Simulate'</span>)
+path(path,<span class="string">'MatFunc/Misc'</span>)
+</pre><h2 id="2">Read data</h2><pre class="codeinput">signa = 400;   <span class="comment">% radius signature steps (moments)</span>
+FLDR = <span class="string">'Images/MomTrain'</span>;
+Figures = {<span class="string">'One'</span>,<span class="string">'Two'</span>,<span class="string">'Three'</span>,<span class="string">'Four'</span>,<span class="string">'Triangle'</span>,<span class="string">'Square'</span>};
+PlotFLG = true;
+
+figure(<span class="string">'color'</span>,<span class="string">'w'</span>,<span class="string">'position'</span>,[100 100 900 900])
+[mom, class] = ImportImagesEvalMoments(FLDR, Figures, signa, PlotFLG);
+
+s = mom;
+[n,~] = size(s);
+s = sqrt(3/n)*(s - mean(s))./std(s);
+</pre><img vspace="5" hspace="5" src="LocMomImag2_01.png" alt=""> <h2 id="3">Do simulations with haard boundary and sliding window</h2><pre class="codeinput">M = 300;          <span class="comment">% number of neurons in the selective layer</span>
+Tmax = 400;       <span class="comment">% max integration time</span>
+Th = 0.8;           <span class="comment">% selective threshold</span>
+h = 0.0025;        <span class="comment">% time step (better to decrease)</span>
+d = 150;          <span class="comment">% inhibitory coupling</span>
+[n,L] = size(mom);  <span class="comment">% dimension and number of stimuli</span>
+f = @(t) mod(round(2*t),L)+1;   <span class="comment">% function defining the stimulus sequence</span>
+alpha = 20;
+
+psl = 0.975;       <span class="comment">% selective probability</span>
+delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
+b2 = (Th/delta)^2;  <span class="comment">% beta^2</span>
+
+<span class="comment">% Set and train the sensory layer with locality</span>
+W0 = 2*rand(n,M) - 1;  <span class="comment">% random neurons</span>
+[~,id] = sort(sum(s'*W0 &gt; Th)); <span class="comment">% sort neurons for convenience</span>
+W0 = W0(:,id);
+
+karr = [300, 150, 100, 50, 25, 3, 2, 1];
+i = 1;
+Sel = zeros(1,length(karr));
+SelHard = zeros(1,length(karr));
+<span class="keyword">for</span> k = karr
+
+    loc = M/k;       <span class="comment">% locality of inhibition</span>
+
+    <span class="comment">% Sliding window</span>
+    W = SimulateNeurons4Loc(Tmax, h, W0, s, f, alpha, b2, Th, d, loc);
+    Resp = s'*W &gt; Th;
+    R = sum(Resp,1);
+    Sel(i) = sum(R==1);
+
+    <span class="comment">% Hard boundary</span>
+    W2 = SimulateNeurons4LocHard(Tmax, h, W0, s, f, alpha, b2, Th, d, loc);
+
+    Resp2 = s'*W2 &gt; Th;
+    R2 = sum(Resp2,1);
+    SelHard(i) = sum(R2==1);
+    i = i+1;
+<span class="keyword">end</span>
+</pre><h2 id="4">Do simulation without locality</h2><pre class="codeinput">W3 = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
+Resp3 = s'*W3 &gt; Th;
+R3 = sum(Resp3,1);
+SelNoLoc = sum(R3==1);
+</pre><h2 id="5">Plot results</h2><pre class="codeinput">figure;
+hold <span class="string">on</span>
+plot(karr, ones(size(karr))*SelNoLoc,<span class="string">'k'</span>);
+plot(karr,Sel,<span class="string">'r'</span>);
+plot(karr,SelHard,<span class="string">'b'</span>);
+ylim([0 300])
+xlim([1 300])
+title(<span class="string">'Selectivity after learning with different locally inhibition rules'</span>)
+xlabel(<span class="string">'group / sliding window size'</span>,<span class="string">'FontSize'</span>,16)
+ylabel(<span class="string">'# selective neurons'</span>,<span class="string">'FontSize'</span>,16)
+legend(<span class="string">'No locality'</span>,<span class="string">'Hard boundary'</span>,<span class="string">'Sliding window'</span>)
+</pre><img vspace="5" hspace="5" src="LocMomImag2_02.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Script to locality of inhibition of Option D: image moments
+%
+%
+% We compare how different locality of inhibition results in different
+% number of selective neurons. We check as well the difference between 
+% having a hard boundary vs window locality.
+%
+% rng(3)
+%
+% We show that neither of them perform much better than global inhibition
+%
+% We use normal activation instead of inhibitory convergence for activation
+%
+%% Prepare enviroment
+%
+clear
+close all
+rng(3) 
+path(path,'MatFunc/Vision')
+path(path,'MatFunc/Simulate')
+path(path,'MatFunc/Misc')
+
+%% Read data
+
+signa = 400;   % radius signature steps (moments)
+FLDR = 'Images/MomTrain';
+Figures = {'One','Two','Three','Four','Triangle','Square'};
+PlotFLG = true; 
+
+figure('color','w','position',[100 100 900 900])
+[mom, class] = ImportImagesEvalMoments(FLDR, Figures, signa, PlotFLG);
+
+s = mom;
+[n,~] = size(s);
+s = sqrt(3/n)*(s - mean(s))./std(s);
+
+%% Do simulations with haard boundary and sliding window
+
+M = 300;          % number of neurons in the selective layer
+Tmax = 400;       % max integration time
+Th = 0.8;           % selective threshold
+h = 0.0025;        % time step (better to decrease)
+d = 150;          % inhibitory coupling
+[n,L] = size(mom);  % dimension and number of stimuli
+f = @(t) mod(round(2*t),L)+1;   % function defining the stimulus sequence
+alpha = 20;  
+
+psl = 0.975;       % selective probability
+delta = sqrt(1 - (2*norminv(psl) / sqrt(5*n)));
+b2 = (Th/delta)^2;  % beta^2
+
+% Set and train the sensory layer with locality
+W0 = 2*rand(n,M) - 1;  % random neurons
+[~,id] = sort(sum(s'*W0 > Th)); % sort neurons for convenience
+W0 = W0(:,id);
+
+karr = [300, 150, 100, 50, 25, 3, 2, 1];
+i = 1;
+Sel = zeros(1,length(karr));
+SelHard = zeros(1,length(karr));
+for k = karr
+    
+    loc = M/k;       % locality of inhibition
+    
+    % Sliding window
+    W = SimulateNeurons4Loc(Tmax, h, W0, s, f, alpha, b2, Th, d, loc);
+    Resp = s'*W > Th;
+    R = sum(Resp,1);
+    Sel(i) = sum(R==1);
+    
+    % Hard boundary
+    W2 = SimulateNeurons4LocHard(Tmax, h, W0, s, f, alpha, b2, Th, d, loc);
+    
+    Resp2 = s'*W2 > Th;
+    R2 = sum(Resp2,1);
+    SelHard(i) = sum(R2==1);
+    i = i+1;
+end
+
+%% Do simulation without locality
+
+W3 = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
+Resp3 = s'*W3 > Th;
+R3 = sum(Resp3,1);
+SelNoLoc = sum(R3==1);
+
+%% Plot results
+figure;
+hold on
+plot(karr, ones(size(karr))*SelNoLoc,'k');
+plot(karr,Sel,'r');
+plot(karr,SelHard,'b');
+ylim([0 300])
+xlim([1 300])
+title('Selectivity after learning with different locally inhibition rules')
+xlabel('group / sliding window size','FontSize',16)
+ylabel('# selective neurons','FontSize',16)
+legend('No locality','Hard boundary','Sliding window')
+
+##### SOURCE END #####
+--></body></html>

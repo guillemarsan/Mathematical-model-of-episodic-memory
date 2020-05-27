@@ -22,7 +22,7 @@ function y2 = SimulateConvergence1(W,s,Th,d,eps,maxiter, loc, hard)
     end
     
     if j == maxiter
-        print('No convergence');
+        disp('No convergence');
     end
 end
 
