@@ -11,9 +11,12 @@ for k = 1:K-1
     % Corrector
     ii = f((k+1)*h);  % active stimulus at t = (k+1)h   
     W = W + 0.5*h*a*(dw + EvRHS(p, x(:,ii), Th, b2, dS)); 
-
-    % With moving window
-    vin = d*(movsum(y.^2,loc) - movsum(y,loc).*y);
+    
+   % With hard boundary
+    vin = zeros(size(dS));
+    for l = 1:loc:size(y,1)-loc+1
+        vin(l:(l+loc-1)) = d*(sum(y(l:(l+loc-1)).^2) - sum(y(l:(l+loc-1)))*y(l:(l+loc-1)));
+    end
    
     dS = max(0, vin - Th);
 end
