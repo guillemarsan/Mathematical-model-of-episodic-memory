@@ -7,7 +7,7 @@ function mom = moments(Im, signa,plotop)
     %   signa = number of points of radius signature to return
     %   plotop = option to plot the transformations
     % Outputs
-    %   mom = a 409x1 vector formed by:
+    %   mom = a (signa+9)x1 vector formed by:
     %       e = eccentricity
     %       mom1 = perimeter^2/area
     %       ph = Hu invaraints
@@ -16,7 +16,7 @@ function mom = moments(Im, signa,plotop)
     
     % Color mask
     redness = double(Im(:,:,1)) - max(double(Im(:,:,2)),double(Im(:,:,3)));
-    mask = redness > 40;
+    mask = redness > 50;
     BiImg = ones(size(Im,1),size(Im,2));
     BiImg = BiImg.*mask;
     FillBiImg = imfill(BiImg);
@@ -70,9 +70,9 @@ function mom = moments(Im, signa,plotop)
 %     hold on;
     
     % Far-close adaptation
-    distances(distances > 0.7) = 1;
-    distances(distances < 0.7) = 0;
-    distances(distances < 0.3) = -1;
+    distances(distances >= 0.7) = 1;
+    distances((distances < 0.7) & (distances >= 0.3)) = 0;
+    distances(distances <= 0.3) = -1;
     
     % Scale up
     distances = distances * 100;
