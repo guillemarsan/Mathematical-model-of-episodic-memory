@@ -15,8 +15,8 @@ path(path,'MatFunc/Misc')
 %% Read training data
 
 signa = 400;   % radius signature steps (moments)
-Figures = {'One','Two','Three','Four','Square','Triangle'};
-FLDR = 'Images/MomTrain';
+Figures = {'Two','Three','Seven','Square','Semicircle','Star','LetterG','LetterH','LetterK'};
+FLDR = 'Images/MomTrain3';
 PlotFLG = true; 
 
 figure('color','w','position',[100 100 900 900])
@@ -84,15 +84,15 @@ ylabel("Stimuli");
 %% Do simulations. Concept layer
 
 rng(3)
-A = 600;       % number of neurons in the selective layer
-K = 2;          % integration
-Thcn = 0.3;     % conceptual threshold
+A = 150;       % number of neurons in the selective layer
+K = 3;          % integration
+Thcn = 0.1;     % conceptual threshold
 % function defining the consectutive signals sequence
 g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1; 
 alpha = 20; 
 
 pcn = 0.975; % selective probability
-bcn2 = 0.3;
+bcn2 = 0.1;
 
 y = max(0,W'*s - Th); % compute reaction to s
 
@@ -125,8 +125,8 @@ dict = conceptmap(F,K);
 
 %% Read test examples
 
-Figures = {'One','Two','Three','Four','Square','Triangle'};
-FLDR = 'Images/MomTest';
+Figures = {'Two','Three','Seven','Square','Semicircle','Star','LetterG','LetterH','LetterK'};
+FLDR = 'Images/MomTest3';
 PlotFLG = true; 
 
 figure('color','w','position',[100 100 900 900])
@@ -135,7 +135,7 @@ figure('color','w','position',[100 100 900 900])
 % Change classes to concept tags
 concpt = zeros(1,length(class));
 for i = 0:(L/K)-1
-    concpt(ismember(class,i*K+1:(i+1)*K)) = i;
+    concpt(ismember(class,i*K+1:(i+1)*K)) = i+1;
 end
 
 s2 = mom;
@@ -146,7 +146,8 @@ s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
 
 error = 0;
 for i=1:Lex
-    if predictcon(W,U,s2(:,i),Th,0.1,dict) ~= concpt(i)
+    [pred,cert] = predictcon3(W,U,s2(:,i),Th,Thcn,dict);
+    if pred ~= concpt(i)
       error = error + 1;
     end
 end

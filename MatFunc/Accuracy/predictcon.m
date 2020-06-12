@@ -14,6 +14,15 @@ function pred = predictcon(W,U,s,Th,Thcn,dict)
     
     y = max(0,W'*s - Th);   % compute selective activation
     ycn = max(0, U'*y - Thcn);  % compute concept activation
+%     concepts = length(unique(dict));
+%     pond = zeros(1,concepts);
+%     %pond(1) = sum(ycn(dict == -1));
+%     for i = 1:concepts-1
+%         pond(i) = sum(ycn(dict == i-1)); 
+%     end
+%     [mpond,indx] = max(pond);
+%     cert = mpond/sum(pond);
+%     pred = indx-1;
     vot = dict(ycn > 0);
     con = unique(vot);
     if con == -1

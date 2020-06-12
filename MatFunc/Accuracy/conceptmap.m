@@ -18,7 +18,7 @@ function dict = conceptmap(F,K)
         zerarr = sum(F(:,zerosidx),2);
         onearr = sum(F(:,onesidx),2);
         % If it activates only for all stimuli of the concept
-        dict((zerarr == 0) & (onearr == K)) = i;
+        dict((zerarr == 0) & (onearr == K)) = i+1;
     end
 
 end
