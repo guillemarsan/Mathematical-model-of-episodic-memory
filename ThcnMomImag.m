@@ -81,53 +81,12 @@ title("Rasterplot selective layer neurons and stimuli they respond to");
 xlabel("Neurons");
 ylabel("Stimuli");
 
-%% Do simulations. Concept layer
-
-rng(3)
-A = 150;       % number of neurons in the selective layer
-K = 3;          % integration
-Thcn = 0.125;     % conceptual threshold
-% function defining the consectutive signals sequence
-g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1; 
-alpha = 20; 
-
-pcn = 0.975; % selective probability
-bcn2 = 0.25;
-
-y = max(0,W'*s - Th); % compute reaction to s
-
-% Hebbian learning
-U0 = 2*rand(M,A) - 1;  % random neurons
-[~,id] = sort(sum(y'*U0 > Thcn)); % sort neurons for convenience
-U0 = U0(:,id);
-
-d = 150; % no inhibition
-
-% Concept layer
-U = SimulateNeurons4(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d);
-
-
-%% Plot concept layer
-
-V = U'*y;
-F = V >= Thcn;
-R = orderRasterPlot(F');
-figure
-spy(R);
-daspect([10 1 100]);
-title("Rasterplot concept layer neurons and stimuli they respond to");
-xlabel("Neurons");
-ylabel("Stimuli");
-
-%% Generate concept map
-
-dict = conceptmap(F,K);
-
-%% Read test examples
+%% Read crossvalidation examples
 
 Figures = {'Two','Three','Seven','Square','Semicircle','Star','LetterG','LetterH','LetterK'};
-FLDR = 'Images/Test';
+FLDR = 'Images/MomCV3';
 PlotFLG = true; 
+K = 3;
 
 figure('color','w','position',[100 100 900 900])
 [mom, class] = ImportImagesEvalMoments(FLDR, Figures, signa, PlotFLG);
@@ -142,16 +101,53 @@ s2 = mom;
 [n,Lex] = size(s2);
 s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
 
-%% Compute precision
+%% Do simulations. Concept layer
 
-error = 0;
-for i=1:Lex
-    [pred,cert] = predictcon3(W,U,s2(:,i),Th,Thcn,dict);
-    if pred ~= concpt(i)
-      error = error + 1;
+rng(2)
+A = 600;       % number of neurons in the selective layer
+K = 3;          % integration
+% function defining the consectutive signals sequence
+g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1; 
+alpha = 20; 
+
+pcn = 0.975; % selective probability
+
+
+y = max(0,W'*s - Th); % compute reaction to s
+
+% Hebbian learning
+U0 = 2*rand(M,A) - 1;  % random neurons
+%[~,id] = sort(sum(y'*U0 > Thcn)); % sort neurons for convenience
+%U0 = U0(:,id);
+
+d = 150; % no inhibition
+
+pts = 5;
+Thcnarr = linspace(0,0.5,pts);
+bcn2arr = linspace(0,0.5,pts);
+prec = zeros(pts,pts);
+conscore = zeros(pts,pts);
+for i = 1:pts
+    for j = 1:pts
+        % Concept layer
+        U = SimulateNeurons4(Tmax, h, U0, y, g, alpha, bcn2arr(i), Thcnarr(j), d);
+        V = U'*y;
+        F = V >= Thcnarr(j);
+        dict = conceptmap(F,K);
+
+        error = 0;
+        for k=1:Lex
+            [pred,cert] = predictcon3(W,U,s2(:,k),Th,Thcnarr(j),dict);
+            if pred ~= concpt(k)
+              error = error + 1;
+            end
+        end
+        
+        conscore(i,j) = conceptscore(dict);
+        prec(i,j) = 1 - error/Lex;
     end
 end
-prec = 1 - error/Lex;
-fprintf("The precision is: %f\n",prec);
 
-
+%% Plot results in table
+disp('The precision is',prec);
+disp('The conceptual score is',conscore);
