@@ -18,10 +18,10 @@ path(path,'MatFunc/Misc')
 %% Read data
 
 signa = 400;   % radius signature steps (moments)
-FLDR = 'Images/Experiment';
+FLDR = 'Images/ExperimentFigures';
 Figures = {'Two','Three','Seven','Square','Semicircle','Star',...
             'LetterK','LetterH','LetterG'};
-PlotFLG = false; 
+PlotFLG = true; 
 
 figure('color','w','position',[100 100 900 900])
 [mom, class] = ImportImagesEvalMoments(FLDR, Figures, signa, PlotFLG);
@@ -39,9 +39,9 @@ S = s./nrmS;
 sym = length(Figures); % number of symbols
 numex = L/sym;         % number of examples per symbol
 
-thresh = 0.55;         % threshold of acceptance
+thresh = 0.5;         % threshold of acceptance
 
-idx = [1];
+idx = [4];
 for i = (numex+1):numex:L
     for j = 0:(numex-1)
         cos = S(:,(i+j))'*S(:,idx);
@@ -60,12 +60,16 @@ if length(Figures) > length(idx)
     fprintf('Could not find one example for each symbol');
 else
     fprintf('The best training examples are\n');
-    for i = 1:length(idx)
-        ex = mod(idx(i),numex);
-        if ex == 0 
-            ex = 5;
-        end
-        fprintf('%s%i\n',Figures{fix(idx(i)/numex)+1},ex);
+    names = {};
+    for k = 1:length(Figures)
+        file_pattern = fullfile(FLDR,[Figures{k}, '*.jpeg']);
+        fls = dir(file_pattern);
+        names = [names,fls.name];
     end
+    
+    for j = 1:length(idx)
+        fprintf([names{idx(j)},'\n']);
+    end
+        
 end
 

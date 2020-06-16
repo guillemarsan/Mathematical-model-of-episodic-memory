@@ -15,12 +15,17 @@ function [pred,cert] = predictcon3(W,U,s,Th,Thcn,dict)
     y = max(0,W'*s - Th);   % compute selective activation
     ycn = max(0, U'*y - Thcn);  % compute concept activation
     concepts = length(unique(dict));
-    pond = zeros(1,concepts-1);
-    %pond(1) = sum(ycn(dict == -1));
-    for i = 1:concepts-1
-        pond(i) = sum(ycn(dict == i)); 
-    end
-    [mpond,indx] = max(pond);
-    cert = mpond/sum(pond);
-    pred = indx;
+    if concepts == 1
+        pred = -1;
+        cert = 1;
+    else
+        pond = zeros(1,concepts-1);
+        %pond(1) = sum(ycn(dict == -1));
+        for i = 1:concepts-1
+            pond(i) = sum(ycn(dict == i)); 
+        end
+        [mpond,indx] = max(pond);
+        cert = mpond/sum(pond);
+        pred = indx;   
+    end 
 end
