@@ -129,12 +129,19 @@ s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
 
 error = 0;
 for i=1:Lex
-    [pred,cert] = predictcon3(W,U,s2(:,i),Th,Thcn,dict);
+    pred = predictcon4(W,U,s2(:,i),Th,Thcn,dict);
     if pred ~= concpt(i)
       error = error + 1;
     end
 end
 prec = 1 - error/Lex;
 fprintf("The precision is: %f\n",prec);
+
+%% Save model matrix
+save('Model/Wmom.mat','W');
+save('Model/Umom.mat','U');
+save('Model/Thmom.mat','Th');
+save('Model/Thcnmom.mat','Thcn');
+save('Model/dictmom.mat','dict');
 
 

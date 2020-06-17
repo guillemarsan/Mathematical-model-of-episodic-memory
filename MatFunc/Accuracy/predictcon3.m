@@ -11,6 +11,7 @@ function [pred,cert] = predictcon3(W,U,s,Th,Thcn,dict)
     %   dict = 1xa array that tags each conceptual neuron to the concept
     % Outputs
     %   pred = guess of the class
+    %   cert = certainty of the guess
     
     y = max(0,W'*s - Th);   % compute selective activation
     ycn = max(0, U'*y - Thcn);  % compute concept activation
@@ -24,8 +25,13 @@ function [pred,cert] = predictcon3(W,U,s,Th,Thcn,dict)
         for i = 1:concepts-1
             pond(i) = sum(ycn(dict == i)); 
         end
-        [mpond,indx] = max(pond);
-        cert = mpond/sum(pond);
+        if sum(pond) ~= 0
+            [mpond,indx] = max(pond);
+            cert = mpond/sum(pond);
+        else
+            indx = -1;
+            cert = 0;
+        end
         pred = indx;   
     end 
 end

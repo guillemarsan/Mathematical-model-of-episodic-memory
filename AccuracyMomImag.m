@@ -146,7 +146,7 @@ s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
 
 error = 0;
 for i=1:Lex
-    [pred,cert] = predictcon3(W,U,s2(:,i),Th,Thcn,dict);
+    pred = predictcon4(W,U,s2(:,i),Th,Thcn,dict);
     if pred ~= concpt(i)
       error = error + 1;
     end

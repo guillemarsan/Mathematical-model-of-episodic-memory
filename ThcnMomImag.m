@@ -137,7 +137,7 @@ for i = 1:pts
 
         error = 0;
         for k=1:Lex
-            [pred,cert] = predictcon3(W,U,s2(:,k),Th,Thcnarr(j),dict);
+            pred = predictcon4(W,U,s2(:,k),Th,Thcnarr(j),dict);
             if pred ~= concpt(k)
               error = error + 1;
             end
