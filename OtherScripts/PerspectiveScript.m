@@ -1,5 +1,5 @@
-%% Script for computing relations between C, R, P
-% C -> the network is certain 
+%% Script for computing relations between R, P and I
+% I -> the model is ignorant
 % R -> the network is right
 % P -> the examples is in very different perspective
 % We compute the relation between the three in the cross validation set.
@@ -48,13 +48,13 @@ s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
 %% Compute misclassification and certainity
 
 error = zeros(1,Lex);
-certain = zeros(1,Lex);
+ignor = zeros(1,Lex);
 for i=1:Lex
     [pred,cert] = predictcon3(W,U,s2(:,i),Th,Thcn,dict);
     if pred ~= concpt(i) 
       error(i) = 1;
     end
-    certain(i) = cert;
+    ignor(i) = (cert == 0);
 end
 
 prec = 1 - sum(error)/Lex;
@@ -62,9 +62,9 @@ fprintf("The precision is: %f\n",prec);
 
 %% Compute relations
 
-% P(R|C)
-cpos = sum(~error & certain > 0)/sum(certain > 0);
-fprintf('A %f of certain classified examples are correctly classified\n',cpos);
+% P(R|~I)
+cpos = sum(~error & ~ignor)/sum(~ignor);
+fprintf('A %f of examples that do not generate ignorance are correctly classified\n',cpos);
 
 % perspectives annotated manually
 pers = [0 0 1 1  1 1 0 0  0 1 0 1  1 1 1 0  1 1 1 0  0 1 0 1  0 1 0 1  ...
@@ -78,9 +78,9 @@ fprintf('A %f of wrongly classified examples are different in perspective\n',cpo
 cpos = sum(~pers & ~error)/sum(~pers);  
 fprintf('A %f of equal in perspective examples are correctly classified\n',cpos);
 
-% P(P|~C)
-cpos = sum(pers == 1 & certain == 0)/sum(certain == 0);  
-fprintf('A %f of uncertain classified examples are different in perspective\n',cpos);
+% P(~I|~P) 
+cpos = sum(~pers & ~ignor)/sum(~pers);  
+fprintf('A %f of equal in perspective examples do not generate ignorance\n',cpos);
 
 %% Histogram of certainty
 figure;

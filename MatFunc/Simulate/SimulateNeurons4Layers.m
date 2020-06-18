@@ -59,10 +59,10 @@ y = max(0, v - Th - dS); % neuronal response
 % derivative of weights (without alpha)
 dw = y' .* (b2*x - v'.*w);
 
-if(sum(sum(isnan(dw))) > 0) %check is there are NaN in the weights
-    disp('Error');
-    return
-end
+% if(sum(sum(isnan(dw))) > 0) %check is there are NaN in the weights
+%     disp('Error');
+%     return
+% end
 
 end
 
