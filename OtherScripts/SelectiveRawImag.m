@@ -20,22 +20,31 @@ path(path,'MatFunc/Misc')
 
 %% Read data
 
-Figures = {'One','Two','Three','Four','Five'};
+FLDR = 'Images/All';
+Figures = {'Two','One','Three','Four','Five'};
 PlotFLG = true; 
 
+
 figure('color','w','position',[100 100 900 900])
-[imgs, class] = ImportImagesEvalRaw(Figures, PlotFLG);
+[imgs, class] = ImportImagesEvalRaw(FLDR,Figures, PlotFLG);
 
 
 %% Sensory stimuli (and angles between them)
 
 s = imgs;
-[n,~] = size(s);
+[n,L] = size(s);
 s = sqrt(3/n)*(s - mean(s))./std(s);
 
 nrmS = sqrt(sum(s.^2)); % norma s
 S = s./nrmS;
 CosAngle = S'*S; % cos(angle)
+idx = [1];
+for i = 2:L
+    cos = S(:,i)'*S(:,idx);
+    if ~(max(cos) > 0.59)
+        idx = [idx,i];
+    end
+end
 
 figure('color','w')
 imagesc(CosAngle,[-1 1])

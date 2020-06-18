@@ -47,7 +47,6 @@ Tmax = 400;       % max integration time
 Th = 0.8;           % selective threshold
 h = 0.0025;        % time step (better to decrease)
 d = 150;          % inhibitory coupling
-loc = M/20;       % locality of inhibition
 [n,L] = size(imgs);  % dimension and number of stimuli
 f = @(t) mod(round(2*t),L)+1;   % function defining the stimulus sequence
 alpha = 20;  
@@ -61,17 +60,17 @@ W0 = 2*rand(n,M) - 1;  % random neurons
 [~,id] = sort(sum(s'*W0 > Th)); % sort neurons for convenience
 W0 = W0(:,id);
 
-W = SimulateNeurons4Loc(Tmax, h, W0, s, f, alpha, b2, Th, d, loc);
+W = SimulateNeurons4(Tmax, h, W0, s, f, alpha, b2, Th, d);
 
 %% Plot selective layer
 
 figure('color','w','position',[100 100 1000 600])
-PlotResultsOfSelectiveStratum(s, W0, W, Th)
+Resp = s'*W > Th;
+Resp0 = s'*W0 > Th;
+PlotResultsOfSelectiveStratum(s, Resp0, Resp)
 
 figure;
-V = W'*s;
-F = V > Th;
-R = orderRasterPlot(F');
+R = orderRasterPlot(Resp);
 spy(R);
 daspect([10 1 100]);
 title("Rasterplot selective layer neurons and stimuli they respond to");
@@ -81,7 +80,7 @@ ylabel("Stimuli");
 %% Do simulations. Concept layer
 
 A = 600;       % number of neurons in the selective layer
-K = 2;          % integration
+K = 3;          % integration
 Thcn = 0.5;     % conceptual threshold
 % function defining the consectutive signals sequence
 g = @(t) mod(round(t),L)+1-mod(round(t),K):mod(round(t),L)+1; 
@@ -97,11 +96,10 @@ U0 = 2*rand(M,A) - 1;  % random neurons
 [~,id] = sort(sum(y'*U0 > Thcn)); % sort neurons for convenience
 U0 = U0(:,id);
 
-loc = A/20;
 d = 150; %no inhibition
 
 % Concept layer
-U = SimulateNeurons4Loc(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d, loc);
+U = SimulateNeurons4(Tmax, h, U0, y, g, alpha, bcn2, Thcn, d);
 
 %% Plot concept layer
 
