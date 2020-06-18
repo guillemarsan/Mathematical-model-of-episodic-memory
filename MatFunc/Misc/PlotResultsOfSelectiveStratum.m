@@ -1,22 +1,25 @@
 function PlotResultsOfSelectiveStratum(s, Resp0, Resp)
 
 clf
+set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1])
 subplot(3,1,1)
 plot(s)
-xlabel('dimension j','FontSize',18)
-ylabel('s_j','FontSize',18)
+xlabel('dimension j','FontSize',16)
+ylabel('s_j','FontSize',16)
 xlim([0 size(s,1)])
 
 
 subplot(3,2,3)
-imagesc(Resp0)
+R0 = orderRasterPlot(Resp0);
+imagesc(R0)
 colormap(flipud(colormap('gray')))
 xlabel('neurons','FontSize',16)
 ylabel('stimulus','FontSize',16)
 title('neuronal response before learning','FontSize',18)
 
 subplot(3,2,4)
-imagesc(Resp)
+R = orderRasterPlot(Resp);
+imagesc(R)
 colormap(flipud(colormap('gray')))
 xlabel('neurons','FontSize',16)
 ylabel('stimulus','FontSize',16)

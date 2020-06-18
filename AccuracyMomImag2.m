@@ -91,11 +91,16 @@ ylabel("Stimuli");
 
 
 %% Plot concept layer
+
 y = max(0,W'*s - Th); % compute reaction to s
-V = U'*y;
-F = V >= Thcn;
-R = orderRasterPlot(F');
+
+figure('color','w','position',[100 100 1000 600])
+Respcn = y'*U > Thcn;
+Respcn0 = y'*U0 > Thcn;
+PlotResultsOfConceptStratum(y, Respcn0, Respcn)
+
 figure
+R = orderRasterPlot(Respcn);
 spy(R);
 daspect([10 1 100]);
 title("Rasterplot concept layer neurons and stimuli they respond to");
