@@ -31,8 +31,15 @@ plot(R0)
 xlim([0, size(Resp0,2)])
 xlabel('neurons','FontSize',16)
 ylabel('# responses','FontSize',16)
-title(['Select. = ' num2str(sum(R0==1)) '; Inact. = ' num2str(sum(R0==0))...
-    '; Rmean = ' num2str(mean(R0),2)]) 
+M = size(Resp0,2);
+sel = sum(R0 == 1);
+inac = sum(R0 == 0);
+L = size(Resp0,1);
+lost = sum(sum(Resp0,2) == 0);
+title(['Select. = ' num2str(sel) '(' num2str(sel*100/M,'%.1f') '%);'...
+    'Inact. = ' num2str(inac) '(' num2str(inac*100/M,'%.1f') '%);'...
+    'Rmean = ' num2str(mean(R0),2) ';'...
+    'Lost stimuli = ' num2str(lost) '(' num2str(lost*100/L,'%.1f') '%)']) 
 
 subplot(3,2,6)
 R = sum(Resp);
@@ -40,5 +47,12 @@ plot(R)
 xlim([0, size(Resp,2)])
 xlabel('neurons','FontSize',16)
 ylabel('# responses','FontSize',16)
-title(['Select. = ' num2str(sum(R==1)) '; Inact. = ' num2str(sum(R==0))...
-     '; Rmean = ' num2str(mean(R),2)])
+M = size(Resp,2);
+sel = sum(R == 1);
+inac = sum(R == 0);
+L = size(Resp,1);
+lost = sum(sum(Resp,2) == 0);
+title(['Select. = ' num2str(sel) '(' num2str(sel*100/M,'%.1f') '%);'...
+    'Inact. = ' num2str(inac) '(' num2str(inac*100/M,'%.1f') '%);'...
+    'Rmean = ' num2str(mean(R),2) ';' ... 
+    'Lost stimuli = ' num2str(lost) '(' num2str(lost*100/L,'%.1f') '%)']) 

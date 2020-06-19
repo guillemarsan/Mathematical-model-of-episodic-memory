@@ -53,7 +53,6 @@ d = 150;          % inhibitory coupling
 f = @(t) mod(fix(t),L)+1;   % function defining the stimulus sequence
 alpha = 30;  
 
-psl = 0.975;       % selective probability
 b2 = 0.7;
 
 % Set and train the sensory layer 
@@ -65,7 +64,6 @@ A = 150;       % number of neurons in the selective layer
 K = 3;          % integration
 Thcn = 0.125;     % conceptual threshold
 
-pcn = 0.975; % selective probability
 bcn2 = 0.25;
 
 U0 = 2*rand(M,A) - 1;  % random neurons
@@ -109,7 +107,7 @@ ylabel("Stimuli");
 
 %% Generate concept map
 
-dict = conceptmap(F,K);
+dict = conceptmap(Respcn',K);
 
 %% Read test examples
 
@@ -133,14 +131,27 @@ s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
 %% Compute precision
 
 error = 0;
+errormis = 0;
+nonignex = 0;
 for i=1:Lex
     pred = predictcon4(W,U,s2(:,i),Th,Thcn,dict);
-    if pred ~= concpt(i)
+    if pred ~= -1
+        nonignex = nonignex + 1;
+        if pred ~= concpt(i)
+            error = error + 1;
+            errormis = errormis + 1;
+        end
+    else
       error = error + 1;
     end
 end
+
 prec = 1 - error/Lex;
 fprintf("The precision is: %f\n",prec);
+
+precmis = 1 - errormis/nonignex;
+fprintf("The precision of misclassification is: %f\n",precmis);
+
 
 %% Save model matrix
 save('Model/Wmom.mat','W');
