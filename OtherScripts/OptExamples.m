@@ -45,7 +45,7 @@ idx = [4];
 for i = (numex+1):numex:L
     for j = 0:(numex-1)
         cos = S(:,(i+j))'*S(:,idx);
-        if ~(max(abs(cos)) > thresh) % if the cosine of all the angles < thresh
+        if ~(max((cos)) > thresh) % if the cosine of all the angles < thresh
             idx = [idx,(i+j)];       % we add it to the set
             break
         end

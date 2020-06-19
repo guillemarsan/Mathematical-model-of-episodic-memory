@@ -54,11 +54,11 @@ for i = 1:numex:L
     cidx = setdiff(1:L,idx);    % indecces of examples of different symbol
     
     % min number of false negatives
-    angles = abs(S(:,idx)'*S(:,idx));
+    angles = S(:,idx)'*S(:,idx);
     symbol(j) =  min(sum(angles<thresh))/numex; 
     
     % min number of false positives
-    anglesinter = abs(S(:,idx)'*S(:,cidx));
+    anglesinter = S(:,idx)'*S(:,cidx);
     intersymbol(j) = min(sum(anglesinter>thresh,2))/(L-numex);
     
     j = j+1;
