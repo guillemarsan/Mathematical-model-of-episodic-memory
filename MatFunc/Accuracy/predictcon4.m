@@ -17,7 +17,6 @@ function pred = predictcon4(W,U,s,Th,Thcn,dict)
     concepts = length(unique(dict));
     if concepts == 1
         pred = -1;
-        cert = 1;
     else
         pond = zeros(1,concepts-1);
         %pond(1) = sum(ycn(dict == -1));

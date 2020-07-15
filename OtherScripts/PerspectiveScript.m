@@ -49,12 +49,14 @@ s2 = sqrt(3/n)*(s2 - mean(s2))./std(s2);
 
 error = zeros(1,Lex);
 ignor = zeros(1,Lex);
+certain = zeros(1,Lex);
 for i=1:Lex
     [pred,cert] = predictcon3(W,U,s2(:,i),Th,Thcn,dict);
     if pred ~= concpt(i) 
       error(i) = 1;
     end
-    ignor(i) = (cert == 0);
+    certain(i) = cert;
+    ignor(i) = (cert == 0);   
 end
 
 prec = 1 - sum(error)/Lex;
@@ -86,7 +88,7 @@ fprintf('A %f of equal in perspective examples do not generate ignorance\n',cpos
 figure;
 set(gcf,'color','w');
 histogram(certain,150);
-xline(0.3,'--');
+xline(0.333,'--');
 xlabel('Certainty');
 ylabel('Counts');
 title('Histogram of certainty of the model for cross validation set');
